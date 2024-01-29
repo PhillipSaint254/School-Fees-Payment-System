@@ -1,0 +1,463 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block body %}
+
+<style>
+    .row div h3 {
+      margin-bottom: 0.5rem;
+      font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .row div h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+    .timeline {
+      position: relative;
+      padding: 0;
+      list-style: none;
+    }
+    .timeline:before {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 40px;
+      width: 2px;
+      margin-left: -1.5px;
+      content: "";
+      background-color: #e9ecef;
+    }
+    .timeline > li {
+      position: relative;
+      min-height: 50px;
+      margin-bottom: 50px;
+    }
+    .timeline > li:after, .timeline > li:before {
+      display: table;
+      content: " ";
+    }
+    .timeline > li:after {
+      clear: both;
+    }
+    .timeline > li .timeline-panel {
+      position: relative;
+      float: right;
+      width: 100%;
+      padding: 0 20px 0 100px;
+      text-align: left;
+    }
+    .timeline > li .timeline-panel:before {
+      right: auto;
+      left: -15px;
+      border-right-width: 15px;
+      border-left-width: 0;
+    }
+    .timeline > li .timeline-panel:after {
+      right: auto;
+      left: -14px;
+      border-right-width: 14px;
+      border-left-width: 0;
+    }
+    .timeline > li .timeline-image {
+      position: absolute;
+      z-index: 100;
+      left: 0;
+      width: 80px;
+      height: 80px;
+      margin-left: 0;
+      text-align: center;
+      color: white;
+      border: 7px solid #e9ecef;
+      border-radius: 100%;
+      background-color: #fed136;
+    }
+    .timeline > li .timeline-image h4 {
+      font-size: 10px;
+      line-height: 14px;
+      margin-top: 12px;
+    }
+    .timeline > li.timeline-inverted > .timeline-panel {
+      float: right;
+      padding: 0 20px 0 100px;
+      text-align: left;
+    }
+    .timeline > li.timeline-inverted > .timeline-panel:before {
+      right: auto;
+      left: -15px;
+      border-right-width: 15px;
+      border-left-width: 0;
+    }
+    .timeline > li.timeline-inverted > .timeline-panel:after {
+      right: auto;
+      left: -14px;
+      border-right-width: 14px;
+      border-left-width: 0;
+    }
+    .timeline > li:last-child {
+      margin-bottom: 0;
+    }
+    .timeline .timeline-heading h4 {
+      margin-top: 0;
+      color: inherit;
+    }
+    .timeline .timeline-heading h4.subheading {
+      text-transform: none;
+    }
+    .timeline .timeline-body > ul,
+    .timeline .timeline-body > p {
+      margin-bottom: 0;
+    }
+
+    @media (min-width: 768px) {
+      .timeline:before {
+        left: 50%;
+      }
+      .timeline > li {
+        min-height: 100px;
+        margin-bottom: 100px;
+      }
+      .timeline > li .timeline-panel {
+        float: left;
+        width: 41%;
+        padding: 0 20px 20px 30px;
+        text-align: right;
+      }
+      .timeline > li .timeline-image {
+        left: 50%;
+        width: 100px;
+        height: 100px;
+        margin-left: -50px;
+      }
+      .timeline > li .timeline-image h4 {
+        font-size: 13px;
+        line-height: 18px;
+        margin-top: 16px;
+      }
+      .timeline > li.timeline-inverted > .timeline-panel {
+        float: right;
+        padding: 0 30px 20px 20px;
+        text-align: left;
+      }
+    }
+    @media (min-width: 992px) {
+      .timeline > li {
+        min-height: 150px;
+      }
+      .timeline > li .timeline-panel {
+        padding: 0 20px 20px;
+      }
+      .timeline > li .timeline-image {
+        width: 150px;
+        height: 150px;
+        margin-left: -75px;
+      }
+      .timeline > li .timeline-image h4 {
+        font-size: 18px;
+        line-height: 26px;
+        margin-top: 30px;
+      }
+      .timeline > li.timeline-inverted > .timeline-panel {
+        padding: 0 20px 20px;
+      }
+    }
+    @media (min-width: 1200px) {
+      .timeline > li {
+        min-height: 170px;
+      }
+      .timeline > li .timeline-panel {
+        padding: 0 20px 20px 100px;
+      }
+      .timeline > li .timeline-image {
+        width: 170px;
+        height: 170px;
+        margin-left: -85px;
+      }
+      .timeline > li .timeline-image h4 {
+        margin-top: 40px;
+      }
+      .timeline > li.timeline-inverted > .timeline-panel {
+        padding: 0 100px 20px 20px;
+      }
+    }
+    .team-member {
+      margin-bottom: 3rem;
+      text-align: center;
+    }
+    .team-member img {
+      width: 14rem;
+      height: 14rem;
+      border: 0.5rem solid rgba(0, 0, 0, 0.1);
+    }
+    .team-member h4 {
+      margin-top: 1.5rem;
+      margin-bottom: 0;
+    }
+</style>
+
+<section class="bg-white py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center pb-5">
+                <h1>Our Services</h1>
+                <i>A brief description about our services.</i>
+            </div>
+        </div>
+        <div class="row text-center">
+            <div class="col-12 col-sm-10 col-lg-4">
+                <div class="row">
+                    <div class="col-12 text-center pb-3">
+                        <span class="fa-stack fa-4x">
+                          <i class="fas fa-circle fa-stack-2x text-warning"></i>
+                          <i class="fas fa-shopping-cart fa-stack-1x fa-inverse"></i>
+                        </span>
+                    </div>
+                    <div class="col-12">
+                        <h3>E-Commerce</h3>
+                    </div>
+                    <div class="col-12">
+                        <p class="px-2">
+                            We excels in e-commerce solutions, providing seamless platforms for businesses to thrive online, ensuring growth and customer engagement in the digital marketplace.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-10 col-lg-4">
+                <div class="row">
+                    <div class="col-12 text-center pb-3">
+                        <span class="fa-stack fa-4x">
+                          <i class="fas fa-circle fa-stack-2x text-warning"></i>
+                          <i class="fas fa-shield-alt fa-stack-1x fa-inverse"></i>
+                        </span>
+                    </div>
+                    <div class="col-12">
+                        <h3>Integrity</h3>
+                    </div>
+                    <div class="col-12">
+                        <p class="px-2">
+                            Our firm prioritizes integrity, fostering trust through transparent practices, ensuring ethical conduct in all aspects of our services, cultivating strong relationships with our clients.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-10 col-lg-4">
+                <div class="row">
+                    <div class="col-12 text-center pb-3">
+                        <span class="fa-stack fa-4x">
+                          <i class="fas fa-circle fa-stack-2x text-warning"></i>
+                          <i class="fas fa-cogs fa-stack-1x fa-inverse"></i>
+                        </span>
+                    </div>
+                    <div class="col-12">
+                        <h3>Automation</h3>
+                    </div>
+                    <div class="col-12">
+                        <p class="px-2">
+                            Our firm adopts automation, optimizing tasks through tech, driving efficiency, and empowering businesses with innovative solutions, fostering growth and success in the digital realm.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5" id="about">
+  <div class="container">
+    <div class="row text-center">
+      <div class="col-12 text-center pb-5">
+        <h1>About Us</h1>
+        <i>Learn about our journey.</i>
+      </div>
+    </div>
+    <ul class="timeline">
+      <li>
+        <div class="timeline-image">
+          <img
+            class="rounded-circle img-fluid"
+            src="{% static 'images/1.jpg' %}"
+            alt=""
+          />
+        </div>
+        <div class="timeline-panel">
+          <div class="timeline-heading">
+            <h4>2009-2011</h4>
+            <h4 class="subheading">Our Humble Beginnings</h4>
+          </div>
+          <div class="timeline-body">
+            <p class="text-muted">
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sunt
+              ut voluptatum eius sapiente, totam reiciendis temporibus qui
+              quibusdam, recusandae sit vero unde, sed, incidunt et ea quo
+              dolore laudantium consectetur!
+            </p>
+          </div>
+        </div>
+      </li>
+      <li class="timeline-inverted">
+        <div class="timeline-image">
+          <img
+            class="rounded-circle img-fluid"
+            src="{% static 'images/2.jpg' %}"
+            alt=""
+          />
+        </div>
+        <div class="timeline-panel">
+          <div class="timeline-heading">
+            <h4>March 2011</h4>
+            <h4 class="subheading">An Agency is Born</h4>
+          </div>
+          <div class="timeline-body">
+            <p class="text-muted">
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sunt
+              ut voluptatum eius sapiente, totam reiciendis temporibus qui
+              quibusdam, recusandae sit vero unde, sed, incidunt et ea quo
+              dolore laudantium consectetur!
+            </p>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="timeline-image">
+          <img
+            class="rounded-circle img-fluid"
+            src="{% static 'images/3.jpg' %}"
+            alt=""
+          />
+        </div>
+        <div class="timeline-panel">
+          <div class="timeline-heading">
+            <h4>December 2012</h4>
+            <h4 class="subheading">Transition to Full Service</h4>
+          </div>
+          <div class="timeline-body">
+            <p class="text-muted">
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sunt
+              ut voluptatum eius sapiente, totam reiciendis temporibus qui
+              quibusdam, recusandae sit vero unde, sed, incidunt et ea quo
+              dolore laudantium consectetur!
+            </p>
+          </div>
+        </div>
+      </li>
+      <li class="timeline-inverted">
+        <div class="timeline-image">
+          <img
+            class="rounded-circle img-fluid"
+            src="{% static 'images/4.jpg' %}"
+            alt=""
+          />
+        </div>
+        <div class="timeline-panel">
+          <div class="timeline-heading">
+            <h4>July 2014</h4>
+            <h4 class="subheading">Phase Two Expansion</h4>
+          </div>
+          <div class="timeline-body">
+            <p class="text-muted">
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sunt
+              ut voluptatum eius sapiente, totam reiciendis temporibus qui
+              quibusdam, recusandae sit vero unde, sed, incidunt et ea quo
+              dolore laudantium consectetur!
+            </p>
+          </div>
+        </div>
+      </li>
+      <li class="timeline-inverted">
+        <div class="timeline-image">
+          <h4>
+            Be Part
+            <br />
+            Of Our
+            <br />
+            Story!
+          </h4>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="bg-light" id="team">
+  <div class="container py-5">
+    <div class="row text-center">
+      <div class="col-12 text-center pb-5">
+        <h1>Our Team</h1>
+        <i>Learn about our team.</i>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-4">
+        <div class="team-member">
+          <img
+            class="mx-auto rounded-circle"
+            src="https://media.licdn.com/dms/image/D4D03AQH6Xd1tc4vBeA/profile-displayphoto-shrink_800_800/0/1692807308864?e=2147483647&v=beta&t=uS3VDYO9gDnq4z0uMWl-qqF2K_VjijaRy5bVNwdwSB8"
+            alt=""
+          />
+          <h4>Phillip Saint</h4>
+          <p class="text-muted">C.E.O</p>
+          <a class="btn btn-dark btn-social mx-2" href="#!"
+            ><i class="fab fa-twitter"></i
+          ></a>
+          <a class="btn btn-dark btn-social mx-2" href="#!"
+            ><i class="fab fa-facebook-f"></i
+          ></a>
+          <a class="btn btn-dark btn-social mx-2" href="#!"
+            ><i class="fab fa-linkedin-in"></i
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="team-member">
+          <img
+            class="mx-auto rounded-circle"
+            src="{% static 'images/guy4.jpg' %}"
+            alt=""
+          />
+          <h4>Richard Oliech</h4>
+          <p class="text-muted">C.O.O</p>
+          <a class="btn btn-dark btn-social mx-2" href="#!"
+            ><i class="fab fa-twitter"></i
+          ></a>
+          <a class="btn btn-dark btn-social mx-2" href="#!"
+            ><i class="fab fa-facebook-f"></i
+          ></a>
+          <a class="btn btn-dark btn-social mx-2" href="#!"
+            ><i class="fab fa-linkedin-in"></i
+          ></a>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="team-member">
+          <img
+            class="mx-auto rounded-circle"
+            src="{% static 'images/guy3.jpg' %}"
+            alt=""
+          />
+          <h4>Kyle Milton</h4>
+          <p class="text-muted">Lead Developer</p>
+          <a class="btn btn-dark btn-social mx-2" href="#!"
+            ><i class="fab fa-twitter"></i
+          ></a>
+          <a class="btn btn-dark btn-social mx-2" href="#!"
+            ><i class="fab fa-facebook-f"></i
+          ></a>
+          <a class="btn btn-dark btn-social mx-2" href="#!"
+            ><i class="fab fa-linkedin-in"></i
+          ></a>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-8 mx-auto text-center">
+        <p class="large text-muted">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut
+          eaque, laboriosam veritatis, quos non quis ad perspiciatis, totam
+          corporis ea, alias ut unde.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

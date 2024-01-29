@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block body %}
+<p></p>
+<section class="bg-white full">
+    <div class="container">
+        <div class="row">
+          <div class="col-12 py-3">
+            <div class="card mb-4">
+              <div class="row">
+                <h3 class="text-center"><strong>YOUR NUMBER 1 FEES PAYMENT SERVICES</strong></h3>
+            </div>
+            <div class="col-10 col-md-8 col-lg-6 mx-auto pb-3">
+              <div class="row">
+                <div class="col-6">
+                  <a href="/pay_fees/" class="btn btn-primary btn-lg btn-block text-center w-100">Pay Fees</a>
+                </div>
+                <div class="col-6">
+                  <a href="/transactions/" class="btn btn-success btn-lg btn-block text-center w-100">My Payments</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12 col-md-8 col-lg-4 py-3">
+            <div class="card mb-4">
+              <div class="card-body text-center">
+                <img src="{% static 'images/user.jpg' %}" alt="avatar"
+                  class="rounded-circle img-fluid" style="width: 150px;">
+                <h5 class="my-3">{{ user.get_full_name }}</h5>
+                <p class="text-muted mb-1">{{ user.email }}</p>
+                {% if user.location %}
+                <p class="text-muted mb-4">{{ user.location }}</p>
+                {% endif %}
+                {% if user.bio %}
+                <div class="d-flex justify-content-center mb-2">
+                  {{ user.bio }}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="card mb-4 mb-lg-0">
+              <div class="card-body p-0">
+                <ul class="list-group list-group-flush rounded-3">
+                  <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                    <i class="fas fa-life-ring fa-lg text-warning"></i>
+                    <p class="mb-0">Help Desk: help@paymyfees.com</p>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                    <i class="fab fa-github fa-lg" style="color: #333333;"></i>
+                    <p class="mb-0">https://github.com/paymyfees</p>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                    <i class="fab fa-twitter fa-lg" style="color: #55acee;"></i>
+                    <p class="mb-0">https://x.com/paymyfees/</p>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                    <i class="fab fa-instagram fa-lg" style="color: #ac2bac;"></i>
+                    <p class="mb-0">https://instagram.com/@paymyfees/</p>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                    <i class="fab fa-facebook-f fa-lg" style="color: #3b5998;"></i>
+                    <p class="mb-0">https://facebook.com/paymyfees/</p>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-8 py-3">
+            <div class="card mb-4">
+              <div class="px-4">
+                <h1 class="text-center">Our Services</h1>
+                <p class="text-justify">Welcome, {{ user.get_short_name.capitalize }}, to our innovative online platform dedicated to revolutionizing fee payments! At our core, we strive to simplify and automate the entire fee payment process, offering unparalleled convenience and efficiency to our users.</p>
+                <p class="text-justify">Gone are the days of cumbersome manual payments. With our service, you can bid farewell to the hassles of traditional transactions. We've designed our platform to streamline every aspect of fee payments, ensuring a seamless and hassle-free experience for all users.</p>
+                <p class="text-justify">Security is paramount in everything we do. Rest assured, your transactions are safeguarded by state-of-the-art security measures at every step of the process. Your peace of mind is our top priority, and we spare no effort in ensuring the integrity and confidentiality of your financial data.</p>
+                <p class="text-justify">Navigating our platform is a breeze. Our user-friendly interface is crafted to cater to diverse needs, making the payment journey smooth and intuitive. Whether you're a student, parent, or institution, our platform is tailored to meet your unique requirements with ease and efficiency.</p>
+                <p class="text-justify">What sets us apart is our unwavering commitment to excellence and customer satisfaction. We understand the importance of trust in financial transactions, which is why we prioritize transparency, reliability, and personalized assistance.</p>
+                <p class="text-justify">Count on us to provide swift resolutions and dedicated support whenever you need it. Join us on this journey to experience the future of fee payments – effortless, secure, and tailored to your needs. Welcome to a new era of online fee management.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

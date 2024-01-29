@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block body %}
+
+<div class="container-fluid bg-faded full">
+    <div class="row">
+        <div class="col-sm-8 col-lg-6 mx-auto align-items-center justify-content-center">
+            <form action="" method="post">
+                {% csrf_token %}
+                <h3 class="display-5 text-center">Welcome. We noticed you are an admin. Where do you want to go?</h3>
+                <div class="d-flex justify-content-around">
+                    <input class="btn btn-primary btn-lg" type="submit" name="student" value="student" placeholder="Home page">
+                    <input class="btn btn-warning btn-lg" type="submit" name="staff" value="staff" placeholder="Staff page">
+                    <input class="btn btn-success btn-lg" type="submit" value="admin" name="admin" placeholder="Admin page">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

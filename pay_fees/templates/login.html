@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block burner %}
+
+{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        background-color: #f8f9fa; /* Light gray background */
+    }
+
+    .full {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .full-75 {
+        min-height: 75vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .login-container {
+        width: 100%;
+        max-width: 98vw;
+        padding: 20px;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        background-color: #ffffff;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .login-container form {
+        margin-top: 15px;
+    }
+
+    .login-container label {
+        font-weight: bold;
+    }
+
+    .email-input .login-container input, .password-input .login-container input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    .login-container .form-check {
+        margin-bottom: 15px;
+    }
+
+    .login-container button {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        background-color: #007bff;
+        color: #ffffff;
+        cursor: pointer;
+    }
+
+    .login-container button:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<div class="container-fluid full-75">
+    <div class="row py-5">
+        <div class="login-container d-flex mx-auto justify-content-center align-items-center">
+            <div>
+                <h2 class="text-center">Login Form</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3 email-input">
+                        <label for="exampleInputEmail1" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="exampleInputEmail1" name="email" aria-describedby="emailHelp">
+                        <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                    </div>
+                    <div class="mb-3 password-input">
+                        <label for="exampleInputPassword1" class="form-label">Password</label>
+                        <input type="password" class="form-control" name="password" id="exampleInputPassword1">
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="exampleCheck1" onchange="passwordViewLogin()">
+                        <label class="form-check-label" for="exampleCheck1">See Password</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">login</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function passwordViewLogin() {
+        var passwordInput = document.getElementById("exampleInputPassword1");
+        var checkbox = document.getElementById("exampleCheck1");
+
+        if (checkbox.checked){
+            passwordInput.type = "text";
+        } else {
+            passwordInput.type = "password";
+        }
+    }
+</script>
+
+{% endblock %}

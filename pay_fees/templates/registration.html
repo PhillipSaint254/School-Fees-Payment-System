@@ -1,0 +1,453 @@
+{% extends "base.html" %}
+
+{% block title %}Registration page{% endblock %}
+
+{% block burner %}
+
+{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        background-color: #f8f9fa; /* Light gray background */
+    }
+
+    .full {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .full-75 {
+        min-height: 75vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .sign-up-container {
+        max-width: 90vw;
+        padding: 20px;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        background-color: #ffffff;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .sign-up-container form {
+        margin-top: 15px;
+    }
+
+    .sign-up-container label {
+        font-weight: bold;
+    }
+
+    .email-input .sign-up-container input, .password-input .sign-up-container input {
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    .sign-up-container .form-check {
+        margin-bottom: 15px;
+    }
+
+    .submit-button {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        background-color: #007bff;
+        color: #ffffff;
+        cursor: pointer;
+    }
+
+    .submit-button:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<style>
+    /* Custom select styles */
+    .custom-select {
+        position: relative;
+        width: 100%;
+    }
+
+    .select-selected {
+        background-color: #f8f9fa;
+        padding: 10px 15px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .select-selected:after {
+        position: absolute;
+        content: "";
+        top: 18px;
+        right: 10px;
+        width: 0;
+        height: 0;
+        border: 6px solid transparent;
+        border-color: #000 transparent transparent transparent;
+    }
+
+    .select-items div {
+        padding: 10px 15px;
+        cursor: pointer;
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+        border-top: none;
+        border-radius: 0 0 4px 4px;
+    }
+
+    .select-items div:hover {
+        background-color: #dee2e6;
+    }
+
+    .select-hide {
+        display: none;
+    }
+
+    .select-options {
+        max-width: 200px;
+        word-wrap: break-word;
+    }
+</style>
+
+
+<div class="container-fluid full-75">
+    <div class="row py-5">
+        <div class="sign-up-container col-10 col-sm-9 col-lg-8 mx-auto justify-content-center bg-white rounded w-100">
+            {% if messages %}
+                <ul>
+                {% for message in messages %}
+                    <li class="text-danger">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+            <div>
+                <h2 class="text-center">Registration Form</h2>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-12 col-md-8 col-lg-4 mb-3">
+                            <label for="first-name" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="first-name" name="first-name" aria-describedby="first-name-help" required>
+                            <div id="first-name-help" class="form-text">As per your national ID/Birth certificate.</div>
+                        </div>
+                        <div class="col-12 col-md-8 col-lg-4 mb-3">
+                            <label for="middle-name" class="form-label">Middle Name</label>
+                            <input type="text" class="form-control" id="middle-name" name="middle-name" aria-describedby="middle-name-help">
+                            <div id="middle-name-help" class="form-text">Optional field.</div>
+                        </div>
+                        <div class="col-12 col-md-8 col-lg-4 mb-3">
+                            <label for="last-name" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="last-name" name="last-name" aria-describedby="last-name-help" required>
+                            <div id="last-name-help" class="form-text">As per your national ID/Birth certificate.</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-8 col-lg-4 mb-3">
+                            <label for="registration-number" class="form-label">Registration Number</label>
+                            <input type="tel" class="form-control" id="registration-number" name="registration-number" aria-describedby="registration-number-help" required>
+                            <div id="registration-number-help" class="form-text">Enter your registration number.</div>
+                        </div>
+                        <div class="col-12 col-md-8 col-lg-4 mb-3">
+                            <label for="id-number" class="form-label">ID Number</label>
+                            <input type="tel" class="form-control" id="id-number" name="id-number" aria-describedby="id-number-help" required>
+                            <div id="id-number-help" class="form-text">Optional field.</div>
+                        </div>
+                        <div class="col-12 col-md-8 col-lg-4 mb-3">
+                            <label for="last-name" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone-number" name="phone-number" aria-describedby="phone-number-help" required>
+                            <div id="phone-number-help" class="form-text">Enter your Safaricom line phone number.</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="exampleInputEmail1" name="email" aria-describedby="emailHelp" required>
+                            <div id="emailHelp" class="form-text">Enter your email.</div>
+                        </div>
+                    </div>
+                    <div class="row" id="school-choice">
+                        <div class="col-12 mb-3">
+                            <label for="school-input" class="form-label">School</label>
+                            <input type="text" class="form-control" id="school-input" name="school-input" oninput="filterSchools(this.value)" aria-describedby="school-help" placeholder="Type your school name" required>
+                            <div id="school-help" class="form-text">Choose your school.</div>
+                            <div id="school-options" class="select-options select-hide"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-8 col-lg-6 mb-3" id="faculty-choice">
+                            <label for="school-input" class="form-label">Faculty</label>
+                            <input type="text" class="form-control" id="faculty-input" name="faculty-input" oninput="filterFaculties(this.value)" disabled aria-describedby="school-help" placeholder="Type your faculty name" required>
+                            <div id="faculty-help" class="form-text">Choose your faculty.</div>
+                            <div id="faculty-options" class="select-faculty-options select-hide"></div>
+                        </div>
+                        <div class="col-12 col-md-8 col-lg-6 mb-3" id="course-choice">
+                            <label for="school-input" class="form-label">Course</label>
+                            <input type="text" class="form-control" id="course-input" name="course-input" oninput="filterCourses(this.value)" disabled aria-describedby="course-help" placeholder="Type your course name" required>
+                            <div id="course-help" class="form-text">Choose your course.</div>
+                            <div id="course-options" class="select-options select-hide"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-8 col-lg-6 mb-3">
+                            <label for="exampleInputPassword1" class="form-label">Set Password</label>
+                            <input type="password" class="form-control" name="password1" id="exampleInputPassword1" disabled required>
+                        </div>
+                        <div class="col-12 col-md-8 col-lg-6 mb-3">
+                            <label for="exampleInputPassword2" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" name="password2" id="exampleInputPassword2" disabled required>
+                        </div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="exampleCheck1" onchange="passwordViewRegister()">
+                        <label class="form-check-label" for="exampleCheck1">See Password</label>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-md-8 mb-3 mx-auto d-flex justify-content-center">
+                            <button type="submit" class="btn btn-primary text-center mx-auto submit-button">sign up</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function passwordViewRegister() {
+        var password1 = document.getElementById("exampleInputPassword1");
+        var password2 = document.getElementById("exampleInputPassword2");
+        var checkbox = document.getElementById("exampleCheck1");
+
+        if (checkbox.checked) {
+            password1.type = "text";
+            password2.type = "text";
+        } else {
+            password1.type = "password";
+            password2.type = "password";
+        }
+    }
+</script>
+
+<script>
+    // Function to fetch schools from the server
+    var facultyInput = document.getElementById("faculty-input");
+    var courseInput = document.getElementById("course-input");
+    var password1Input = document.getElementById("exampleInputPassword1");
+    var password2Input = document.getElementById("exampleInputPassword2");
+    var selectedSchoolPK = -1;
+    var selectdFacultyPK = -1;
+
+    function fetchSchools() {
+        return fetch('/get_all_schools/')
+            .then(response => response.json())
+            .then(data => {
+                return data.schools; // Return the list of schools
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    // When the page loads, fetch schools and then perform actions
+    window.onload = function () {
+        fetchSchools()
+            .then(schools => {
+                // Once schools are fetched, store them and perform other actions
+                var schoolInput = document.getElementById("school-input");
+                schoolInput.setAttribute('data-schools', JSON.stringify(schools));
+            })
+            .catch(error => {
+                console.error('Error fetching schools:', error);
+            });
+
+            facultyInput.disabled = true;
+            facultyInput.value = ""; // Reset faculty input
+            courseInput.disabled = true; // Disable course input
+            courseInput.value = "";
+            password1Input.disabled = true;
+            password1Input.value = "";
+            document.getElementById("faculty-options").innerHTML = ""; // Clear previous
+    };
+
+    // Function to filter schools based on user input
+    function filterSchools(input) {
+        var schoolOptions = document.getElementById("school-options");
+        schoolOptions.innerHTML = ""; // Clear previous options
+
+        var schools = JSON.parse(document.getElementById("school-input").getAttribute('data-schools'));
+
+        if (input.trim() === "") {
+            schoolOptions.classList.add("select-hide");
+            return;
+        }
+
+        var matchingSchools = schools.filter(function(school) {
+            return school.toLowerCase().includes(input.toLowerCase());
+        });
+
+        if (matchingSchools.length > 0) {
+            schoolOptions.classList.remove("select-hide");
+            matchingSchools.forEach(function(school) {
+                var option = document.createElement("div");
+                option.textContent = school;
+                option.addEventListener("click", function() {
+                    selectSchool(this.textContent);
+                    facultyInput.disabled = false;
+                });
+                schoolOptions.appendChild(option);
+            });
+        } else {
+            schoolOptions.classList.add("select-hide");
+        }
+    }
+
+    // Function to handle the selection of a school
+    function selectSchool(school) {
+        var schoolInput = document.getElementById("school-input");
+        schoolInput.value = school;
+        selectedSchoolPK = school.split(":")[0];
+        document.getElementById("school-options").classList.add("select-hide");
+    }
+
+    // Event listener to close the dropdown when clicked outside
+    document.addEventListener("click", function(e) {
+        if (!e.target.matches('#school-input')) {
+            document.getElementById("school-options").classList.add("select-hide");
+            fetchFaculties()
+                .then(faculties => {
+                    // Once schools are fetched, store them and perform other actions
+                    var facultyInput = document.getElementById("faculty-input");
+                    facultyInput.setAttribute('data-faculty', JSON.stringify(faculties));
+                });
+        }
+    });
+
+    // Function to fetch faculties from the server based on selected school
+    function fetchFaculties() {
+        return fetch('/get_faculties/?school=' + selectedSchoolPK)
+            .then(response => response.json())
+            .then(data => {
+                return data.faculties; // Return the list of faculties
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    // Function to filter schools based on user input
+    function filterFaculties(input) {
+        var facultyOptions = document.getElementById("faculty-options");
+        facultyOptions.innerHTML = ""; // Clear previous options
+
+        var faculties = JSON.parse(document.getElementById("faculty-input").getAttribute('data-faculty'));
+
+        if (input.trim() === "") {
+            facultyOptions.classList.add("select-hide");
+            return;
+        }
+
+        var matchingFaculties = faculties.filter(function(faculty) {
+            return faculty.toLowerCase().includes(input.toLowerCase());
+        });
+
+        if (matchingFaculties.length > 0) {
+            facultyOptions.classList.remove("select-hide");
+            matchingFaculties.forEach(function(faculty) {
+                var option = document.createElement("div");
+                option.textContent = faculty;
+                option.addEventListener("click", function() {
+                    selectFaculty(this.textContent);
+                    fetchCourses()
+                        .then(courses => {
+                            // Once schools are fetched, store them and perform other actions
+                            var courseInput = document.getElementById("course-input");
+                            courseInput.setAttribute('data-course', JSON.stringify(courses));
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                });
+                facultyOptions.appendChild(option);
+            });
+        } else {
+            facultyOptions.classList.add("select-hide");
+        }
+    }
+
+    // Function to enable course input when a faculty is selected
+    function selectFaculty(faculty) {
+        var facultyInput = document.getElementById("faculty-input");
+        facultyInput.value = faculty;
+        selectedFacultyPK = faculty.split(":")[0];
+        document.getElementById("faculty-options").classList.add("select-hide");
+        courseInput.disabled = false;
+        courseInput.value = "";
+    }
+
+    // Function to fetch courses from the server based on selected school
+    function fetchCourses() {
+        return fetch('/get_courses/?school=' + selectedSchoolPK + '&faculty=' + selectedFacultyPK)
+            .then(response => response.json())
+            .then(data => {
+                console.log("handling fetch course");
+                console.log(data);
+                return data.courses; // Return the list of faculties
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    function filterCourses(input) {
+        var courseOptions = document.getElementById("course-options");
+        courseOptions.innerHTML = ""; // Clear previous options
+
+        var courses = JSON.parse(document.getElementById("course-input").getAttribute('data-course'));
+
+        if (input.trim() === "") {
+            courseOptions.classList.add("select-hide");
+            return;
+        }
+
+        var matchingCourses = courses.filter(function(course) {
+            return course.toLowerCase().includes(input.toLowerCase());
+        });
+
+        if (matchingCourses.length > 0) {
+            courseOptions.classList.remove("select-hide");
+            matchingCourses.forEach(function(course) {
+                var option = document.createElement("div");
+                option.textContent = course;
+                option.addEventListener("click", function() {
+                    selectCourse(this.textContent);
+                });
+                courseOptions.appendChild(option);
+            });
+        } else {
+            courseOptions.classList.add("select-hide");
+        }
+    }
+
+    // Function to enable course input when a course is selected
+    function selectCourse(course) {
+        var courseInput = document.getElementById("course-input");
+        courseInput.value = course;
+        document.getElementById("course-options").classList.add("select-hide");
+        password1Input.disabled = false;
+        password2Input.disabled = false;
+    }
+</script>
+
+{% endblock %}
