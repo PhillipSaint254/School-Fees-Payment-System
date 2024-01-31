@@ -180,6 +180,7 @@ class Transaction(models.Model):
     # "FirstName": "John",
     # "MiddleName": ""
     # "LastName": "Doe"
+    student = models.ForeignKey(Student, on_delete=models.DO_NOTHING, null=True)
     transaction_code = models.CharField(max_length=50, unique=True, default=code_generate)
     transaction_type = models.CharField(max_length=10, null=True)
     transaction_id = models.CharField(max_length=10, null=True)
@@ -195,6 +196,7 @@ class Transaction(models.Model):
     last_name = models.CharField(max_length=50, null=True)
     complete = models.BooleanField(default=False)
     time_stamp = models.DateTimeField(default=default_now, null=True)
+    payment_method = models.CharField(max_length=20, default="m-pesa")
 
     def __str__(self):
         return f"<{self.transaction_id}> {self.first_name} {self.last_name}"

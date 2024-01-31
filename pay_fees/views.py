@@ -330,10 +330,37 @@ def dashboard(request):
 def pay_fees(request):
     user = request.user
     if user.is_authenticated:
+        try:
+            student = Student.objects.get(user=user)
+        except Student.DoesNotExist:
+            messages.error(request, "Only students are allowed to make transactions")
+            return redirect("pay_fees:dashboard")
+
         payment_options = PaymentMethods.objects.all()
-        transaction = Transaction(user=user)
-        return render(request, "payment method.html", {"payment_options": payment_options})
+        transaction = Transaction(student=student)
+        transaction.transaction_amount = student.balance
+        transaction.save()
+        return render(request, "payment method.html", {"payment_options": payment_options, "transaction": transaction})
     messages.error(request, "Access reserved to authenticated users!")
     return redirect("pay_fees:login")
 
 
+def handle_selected_payment_method(request, id):
+    user = request.user
+    if user.is_authenticated:
+        transaction = Transaction.objects.get(id=id)
+        if transaction.user == user:
+            if not transaction.complete:
+                if request.method == "POST":
+                    payment_method = request.POST.get("paymentMethod", "")
+                    transaction.payment_method = payment_method
+                    transaction.save()
+                    return render(request, "payment details.html", {"transaction": transaction})
+                messages.error(request, "No payment method selected")
+                return redirect("pay_fees:dashboard")
+            messages.error(request, "Transaction already effected.")
+            return redirect("pay_fees:dashboard")
+        messages.error(request, "You are not authorized to make this transaction!")
+        return redirect("pay_fees:dashboard")
+    messages.error(request, "Access reserved to authenticated users!")
+    return redirect("pay_fees:login")

@@ -21,5 +21,6 @@ urlpatterns = [
     path('get_faculties/', views.get_faculties, name='get_faculties'),
     path('get_courses/', views.get_courses, name='get_courses'),
     path("dashboard/", views.dashboard, name="dashboard"),
-    path("pay_fees/", views.pay_fees, name="pay_fees")
+    path("pay_fees/", views.pay_fees, name="pay_fees"),
+    path("pay_fees/<int:id>/", views.handle_selected_payment_method, name="handle_selected_payment_method"),
 ]
