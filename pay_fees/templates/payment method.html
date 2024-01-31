@@ -39,26 +39,44 @@
 <section class="full">
     <div class="container pt-5">
         <div class="row">
-            <div class="col-12">
-            </div>
-            <div class="col-10 col-md-8 col-lg-6 mx-auto">
-                <div class="card bg-white">
-                    <div class="card-title">
-                        <h1 class="text-center">Choose Payment Method</h1>
-                    </div>
-                    <div class="card-body">
-                        <form action="#" method="POST" id="paymentForm" class="mx-4">
-                          {% csrf_token %}
-                          <div class="payment-options">
-                            {% for option in payment_options %}
-                                <div class="payment-option" data-value="{{ option.name }}">
-                                  <input type="radio" id="{{ option.pk }}" name="paymentMethod" value="{{ option.name }}">
-                                  <label for="{{ option.pk }}">{{ option.name }}</label>
-                                </div>
-                              {% endfor %}
+            <div class="col-12 col-md-10 col-lg-8 mx-auto">
+                <div class="row">
+                    <div class="col-10 col-md-8 col-lg-5 mx-auto">
+                        <div class="card">
+                          <div class="card-header">
+                            <h3 class="text-center">
+                                <strong>Transaction Details</strong>
+                            </h3>
                           </div>
-                          <button type="submit" class="btn btn-primary btn-block mt-4">Pay Now</button>
-                        </form>
+                          <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Code: {{ transaction.transaction_code }}</li>
+                            <li class="list-group-item">Date: {{ transaction.time_stamp.date }}</li>
+                            <li class="list-group-item">TIme: {{ transaction.time_stamp.time }}</li>
+                          </ul>
+                        </div>
+                    </div>
+                    <div class="col-10 col-md-8 col-lg-7 mx-auto">
+                        <div class="card bg-white">
+                            <div class="card-header">
+                              <h3 class="text-center">
+                                <strong>Choose Payment Method</strong>
+                              </h3>
+                            </div>
+                            <div class="card-body">
+                                <form action="#" method="POST" id="paymentForm" class="mx-4">
+                                  {% csrf_token %}
+                                  <div class="payment-options">
+                                    {% for option in payment_options %}
+                                        <div class="payment-option" data-value="{{ option.name }}">
+                                          <input type="radio" id="{{ option.pk }}" name="paymentMethod" value="{{ option.name }}">
+                                          <label for="{{ option.pk }}">{{ option.name }}</label>
+                                        </div>
+                                      {% endfor %}
+                                  </div>
+                                  <button type="submit" class="btn btn-primary btn-block mt-4">Pay Now</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

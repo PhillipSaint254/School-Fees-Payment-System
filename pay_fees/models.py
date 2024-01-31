@@ -14,6 +14,34 @@ def default_now():
     return now
 
 
+def code_generate():
+    last_trans = Transaction.objects.all().order_by("-transaction_code")
+    current_date = datetime.now().strftime('%Y%m%d')
+
+    if last_trans.count() > 0:
+        counter = 1
+        print(last_trans[0].transaction_code)
+        new_code = int(last_trans[0].transaction_code[-6:-1]) + counter
+        if len(str(new_code)) > 5:
+            new_code = "00001"
+        transaction_code = f"MxS{current_date}{new_code}"
+        while True:
+            try:
+                Transaction.objects.get(transaction_code=transaction_code)
+                counter += 1
+                new_code += counter
+                if len(str(new_code)) > 5:
+                    new_code = "00001"
+                transaction_code = f"{current_date}{new_code}"
+            except Transaction.DoesNotExist:
+                break
+        return transaction_code
+    else:
+        random_numbers = ''.join(str(random.randint(0, 9)) for _ in range(5))
+        transaction_code = f"MxS{current_date}{random_numbers}"
+        return transaction_code
+
+
 class CustomUserManager(UserManager):
     def _create_user(self, email, password, **extra_fields):
         if not email:
@@ -152,7 +180,7 @@ class Transaction(models.Model):
     # "FirstName": "John",
     # "MiddleName": ""
     # "LastName": "Doe"
-    transaction_code = models.CharField(max_length=50, unique=True)
+    transaction_code = models.CharField(max_length=50, unique=True, default=code_generate)
     transaction_type = models.CharField(max_length=10, null=True)
     transaction_id = models.CharField(max_length=10, null=True)
     transaction_time = models.DateTimeField(null=True)
@@ -166,6 +194,7 @@ class Transaction(models.Model):
     first_name = models.CharField(max_length=50, null=True)
     last_name = models.CharField(max_length=50, null=True)
     complete = models.BooleanField(default=False)
+    time_stamp = models.DateTimeField(default=default_now, null=True)
 
     def __str__(self):
         return f"<{self.transaction_id}> {self.first_name} {self.last_name}"

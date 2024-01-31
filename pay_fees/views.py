@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_GET
 from django_daraja.mpesa.core import MpesaClient
-from pay_fees.models import default_now, School, Faculty, Course, Student, User, PaymentMethods
+from pay_fees.models import default_now, School, Faculty, Course, Student, User, PaymentMethods, Transaction
 
 
 # def index(request):
@@ -331,6 +331,7 @@ def pay_fees(request):
     user = request.user
     if user.is_authenticated:
         payment_options = PaymentMethods.objects.all()
+        transaction = Transaction(user=user)
         return render(request, "payment method.html", {"payment_options": payment_options})
     messages.error(request, "Access reserved to authenticated users!")
     return redirect("pay_fees:login")
