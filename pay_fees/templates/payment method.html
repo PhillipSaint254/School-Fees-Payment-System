@@ -50,6 +50,7 @@
                           </div>
                           <ul class="list-group list-group-flush">
                             <li class="list-group-item">Code: {{ transaction.transaction_code }}</li>
+                            <li class="list-group-item">ID: {{ transaction.id }}</li>
                             <li class="list-group-item">Date: {{ transaction.time_stamp.date }}</li>
                             <li class="list-group-item">TIme: {{ transaction.time_stamp.time }}</li>
                           </ul>
@@ -63,7 +64,7 @@
                               </h3>
                             </div>
                             <div class="card-body">
-                                <form action="#" method="POST" id="paymentForm" class="mx-4">
+                                <form action="/pay_fees/{{ transaction.id }}/" method="POST" id="paymentForm" class="mx-4">
                                   {% csrf_token %}
                                   <div class="payment-options">
                                     {% for option in payment_options %}

@@ -75,11 +75,11 @@
         <div class="login-container d-flex mx-auto justify-content-center align-items-center">
             <div>
                 <h2 class="text-center">Payment Details</h2>
-                <form method="post">
+                <form action="/payment_details/{{ transaction.id }}/" method="post">
                     {% csrf_token %}
                     <div class="mb-3 email-input">
                         <label for="exampleInputEmail1" class="form-label">Amount</label>
-                        <input type="number" class="form-control" id="exampleInputEmail1" name="email" value="{{ transaction.amount }}" aria-describedby="emailHelp">
+                        <input type="number" class="form-control" id="exampleInputEmail1" name="amount" value="{% if transaction.amount %}{{ transaction.amount }}{% else %}{{ transaction.student.balance }}{% endif %}" aria-describedby="emailHelp">
                         <div id="emailHelp" class="form-text">Enter the amount you'd wish to pay.</div>
                     </div>
                     <div class="mb-3 email-input">
@@ -87,24 +87,11 @@
                         <input type="tel" class="form-control" id="phone-number" name="phone-number" value="{{ user.phone }}" aria-describedby="phone-number-help">
                         <div id="phone-number-help" class="form-text">Enter the phone number that will pay.</div>
                     </div>
-                    <button type="submit" class="btn btn-primary">login</button>
+                    <button type="submit" class="btn btn-primary">send</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-    function passwordViewLogin() {
-        var passwordInput = document.getElementById("exampleInputPassword1");
-        var checkbox = document.getElementById("exampleCheck1");
-
-        if (checkbox.checked){
-            passwordInput.type = "text";
-        } else {
-            passwordInput.type = "password";
-        }
-    }
-</script>
 
 {% endblock %}

@@ -349,7 +349,7 @@ def handle_selected_payment_method(request, id):
     user = request.user
     if user.is_authenticated:
         transaction = Transaction.objects.get(id=id)
-        if transaction.user == user:
+        if transaction.student.user == user:
             if not transaction.complete:
                 if request.method == "POST":
                     payment_method = request.POST.get("paymentMethod", "")
@@ -357,6 +357,47 @@ def handle_selected_payment_method(request, id):
                     transaction.save()
                     return render(request, "payment details.html", {"transaction": transaction})
                 messages.error(request, "No payment method selected")
+                return redirect("pay_fees:dashboard")
+            messages.error(request, "Transaction already effected.")
+            return redirect("pay_fees:dashboard")
+        messages.error(request, "You are not authorized to make this transaction!")
+        return redirect("pay_fees:dashboard")
+    messages.error(request, "Access reserved to authenticated users!")
+    return redirect("pay_fees:login")
+
+
+def payment_details(request, id):
+    user = request.user
+    if user.is_authenticated:
+        transaction = Transaction.objects.get(id=id)
+        if transaction.student.user == user:
+            if not transaction.complete:
+                if request.method == "POST":
+                    amount = request.POST["amount"]
+                    phone = request.POST["phone-number"]
+                    transaction.amount = amount
+                    transaction.msisdn = phone
+                    transaction.save()
+                    return render(request, "confirm pay.html", {"transaction": transaction})
+                messages.error(request, "Form not submitted")
+                return redirect("pay_fees:dashboard")
+            messages.error(request, "Transaction already effected.")
+            return redirect("pay_fees:dashboard")
+        messages.error(request, "You are not authorized to make this transaction!")
+        return redirect("pay_fees:dashboard")
+    messages.error(request, "Access reserved to authenticated users!")
+    return redirect("pay_fees:login")
+
+
+def confirm_pay(request, id):
+    user = request.user
+    if user.is_authenticated:
+        transaction = Transaction.objects.get(id=id)
+        if transaction.student.user == user:
+            if not transaction.complete:
+                if request.method == "POST":
+                    pass
+                messages.error(request, "Form not submitted")
                 return redirect("pay_fees:dashboard")
             messages.error(request, "Transaction already effected.")
             return redirect("pay_fees:dashboard")
