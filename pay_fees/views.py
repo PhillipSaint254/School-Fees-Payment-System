@@ -373,7 +373,7 @@ def payment_details(request, id):
                 if request.method == "POST":
                     amount = request.POST["amount"]
                     phone = request.POST["phone-number"]
-                    transaction.amount = amount
+                    transaction.transaction_amount = amount
                     transaction.msisdn = phone
                     transaction.save()
                     return render(request, "confirm pay.html", {"transaction": transaction})
