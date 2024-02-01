@@ -396,7 +396,59 @@ def confirm_pay(request, id):
         if transaction.student.user == user:
             if not transaction.complete:
                 if request.method == "POST":
-                    pass
+                    if "yes" in request.POST:
+                        # "TransactionType": "Pay Bill",
+                        # "TransID": "RKTQDM7W6S",
+                        # "TransTime": "20191122063845",
+                        # "TransAmount": "10"
+                        # "BusinessShortCode": "600638",
+                        # "BillRefNumber": "invoice008",
+                        # "InvoiceNumber": "",
+                        # "OrgAccountBalance": ""
+                        # "ThirdPartyTransID": "",
+                        # "MSISDN": "25470****149",
+                        # "FirstName": "John",
+                        # "MiddleName": ""
+                        # "LastName": "Doe"
+
+                        # {"MerchantRequestID": "53e3-4aa8-9fe0-8fb5e4092cdd240016",
+                        #  "CheckoutRequestID": "ws_CO_01022024073918981742332937", "ResponseCode": "0",
+                        #  "ResponseDescription": "Success. Request accepted for processing",
+                        #  "CustomerMessage": "Success. Request accepted for processing"}
+
+                        # merchant_request_id = models.CharField(max_length=50, null=True)
+                        # checkout_request_id = models.CharField(max_length=50, null=True)
+                        # response_code = models.IntegerField(null=True)
+                        # customer_message = models.CharField(max_length=250, null=True)
+                        # response_description = models.CharField(max_length=250, null=True)
+                        try:
+                            cl = MpesaClient()
+                            # Use a Safaricom phone number that you have access to, for you to be able to view the prompt.
+                            phone_number = transaction.msisdn
+                            amount = transaction.amount
+                            account_reference = 'reference'
+                            transaction_desc = 'Description'
+                            callback_url = 'https://darajambili.herokuapp.com/express-payment'
+                            response = cl.stk_push(phone_number, amount, account_reference, transaction_desc, callback_url)
+
+                            transaction.merchant_request_id = response.MerchantRequestID
+                            transaction.checkout_request_id = response.CheckoutRequestID
+                            transaction.response_code = response.ResponseCode
+                            transaction.customer_message = response.CustomerMessage
+                            transaction.response_description = response.ResponseDescription
+                            transaction.save()
+
+                            if response.ResponseCode == 0:
+                                return render(request, "complete pay.html", {"transaction": transaction})
+                            messages.error(request, f"Check your internet connection and confirm if {phone_number} "
+                                                    f"is your mobile payment number.")
+
+                            return redirect("pay_fees:dashboard")
+                        except Exception as error:
+                            messages.error(request, error)
+                            return redirect("pay_fees:dashboard")
+                    messages.success(request, "You have successfully cancelled this transaction.")
+                    return redirect("pay_fees:dashboard")
                 messages.error(request, "Form not submitted")
                 return redirect("pay_fees:dashboard")
             messages.error(request, "Transaction already effected.")

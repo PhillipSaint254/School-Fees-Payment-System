@@ -180,6 +180,11 @@ class Transaction(models.Model):
     # "FirstName": "John",
     # "MiddleName": ""
     # "LastName": "Doe"
+
+    # {"MerchantRequestID": "53e3-4aa8-9fe0-8fb5e4092cdd240016",
+    #  "CheckoutRequestID": "ws_CO_01022024073918981742332937", "ResponseCode": "0",
+    #  "ResponseDescription": "Success. Request accepted for processing",
+    #  "CustomerMessage": "Success. Request accepted for processing"}
     student = models.ForeignKey(Student, on_delete=models.DO_NOTHING, null=True)
     transaction_code = models.CharField(max_length=50, unique=True, default=code_generate)
     transaction_type = models.CharField(max_length=10, null=True)
@@ -197,6 +202,12 @@ class Transaction(models.Model):
     complete = models.BooleanField(default=False)
     time_stamp = models.DateTimeField(default=default_now, null=True)
     payment_method = models.CharField(max_length=20, default="m-pesa")
+    # Preprocessing data
+    merchant_request_id = models.CharField(max_length=50, null=True)
+    checkout_request_id = models.CharField(max_length=50, null=True)
+    response_code = models.IntegerField(null=True)
+    customer_message = models.CharField(max_length=250, null=True)
+    response_description = models.CharField(max_length=250, null=True)
 
     def __str__(self):
         return f"<{self.transaction_id}> {self.first_name} {self.last_name}"
