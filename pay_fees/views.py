@@ -434,7 +434,9 @@ def confirm_pay(request, id):
 
                             # Parse the JSON response
                             response = response_json.json()
+                            print()
                             print(response)
+                            print()
 
                             response_code = response.get('ResponseCode', None)
                             if response_code:
