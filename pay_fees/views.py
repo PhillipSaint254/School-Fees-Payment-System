@@ -10,43 +10,43 @@ from django_daraja.mpesa.core import MpesaClient
 from pay_fees.models import default_now, School, Faculty, Course, Student, User, PaymentMethods, Transaction
 
 
-# def index(request):
-#     cl = MpesaClient()
-#     # Use a Safaricom phone number that you have access to, for you to be able to view the prompt.
-#     phone_number = '0742332937'
-#     amount = 1
-#     account_reference = 'reference'
-#     transaction_desc = 'Description'
-#     callback_url = 'https://darajambili.herokuapp.com/express-payment';
-#     response = cl.stk_push(phone_number, amount, account_reference, transaction_desc, callback_url)
-#     return HttpResponse(response)
-
-
 def index(request):
-    user = request.user
-    if user.is_authenticated:
-        if user.is_superuser:
-            if request.method == "POST":
-                if request.POST.get("admin"):
-                    return render(request, "admin index.html")
-                elif request.POST.get("staff"):
-                    return render(request, "staff index.html")
-                elif request.POST.get("student"):
-                    return render(request, "index.html", {"current_time": default_now()})
-                else:
-                    messages.error(request, "Invalid choice, please select again.")
-            return render(request, "admin login prompt.html")
-        elif user.is_staff:
-            if request.method == "POST":
-                if request.POST.get("staff"):
-                    return render(request, "staff index.html")
-                elif request.POST.get("student"):
-                    return render(request, "index.html", {"current_time": default_now()})
-                else:
-                    messages.error(request, "Invalid choice, please select again.")
-            return render(request, "staff login prompt.html")
-        return render(request, "dashboard.html", {"current_time": default_now()})
-    return render(request, "index.html", {"current_time": default_now()})
+    cl = MpesaClient()
+    # Use a Safaricom phone number that you have access to, for you to be able to view the prompt.
+    phone_number = '0742332937'
+    amount = 1
+    account_reference = 'reference'
+    transaction_desc = 'Description'
+    callback_url = 'https://darajambili.herokuapp.com/express-payment';
+    response = cl.stk_push(phone_number, amount, account_reference, transaction_desc, callback_url)
+    return HttpResponse(response)
+
+
+# def index(request):
+#     user = request.user
+#     if user.is_authenticated:
+#         if user.is_superuser:
+#             if request.method == "POST":
+#                 if request.POST.get("admin"):
+#                     return render(request, "admin index.html")
+#                 elif request.POST.get("staff"):
+#                     return render(request, "staff index.html")
+#                 elif request.POST.get("student"):
+#                     return render(request, "index.html", {"current_time": default_now()})
+#                 else:
+#                     messages.error(request, "Invalid choice, please select again.")
+#             return render(request, "admin login prompt.html")
+#         elif user.is_staff:
+#             if request.method == "POST":
+#                 if request.POST.get("staff"):
+#                     return render(request, "staff index.html")
+#                 elif request.POST.get("student"):
+#                     return render(request, "index.html", {"current_time": default_now()})
+#                 else:
+#                     messages.error(request, "Invalid choice, please select again.")
+#             return render(request, "staff login prompt.html")
+#         return render(request, "dashboard.html", {"current_time": default_now()})
+#     return render(request, "index.html", {"current_time": default_now()})
 
 
 def admin_index(request):
@@ -414,6 +414,9 @@ def confirm_pay(request, id):
                         #  "ResponseDescription": "Success. Request accepted for processing",
                         #  "CustomerMessage": "Success. Request accepted for processing"}
 
+                        # {"requestId": "be17-4b49-886b-71ba6eedc4f2271737", "errorCode": "500.001.1001",
+                        #  "errorMessage": "Unable to lock subscriber, a transaction is already in process for the current subscriber"}
+
                         # merchant_request_id = models.CharField(max_length=50, null=True)
                         # checkout_request_id = models.CharField(max_length=50, null=True)
                         # response_code = models.IntegerField(null=True)
@@ -429,19 +432,23 @@ def confirm_pay(request, id):
                             callback_url = 'https://paymyfees.onrender.com/process_pay/{{ transaction.id }}/'
                             response = cl.stk_push(phone_number, amount, account_reference, transaction_desc, callback_url)
 
-                            transaction.merchant_request_id = response.MerchantRequestID
-                            transaction.checkout_request_id = response.CheckoutRequestID
-                            transaction.response_code = response.ResponseCode
-                            transaction.customer_message = response.CustomerMessage
-                            transaction.response_description = response.ResponseDescription
-                            transaction.save()
 
                             if response.ResponseCode == 0:
+                                transaction.checkout_request_id = response.CheckoutRequestID
+                                transaction.response_code = response.ResponseCode
+                                transaction.merchant_request_id = response.MerchantRequestID
+                                transaction.customer_message = response.CustomerMessage
+                                transaction.response_description = response.ResponseDescription
+                                transaction.save()
                                 return render(request, "complete pay.html", {"transaction": transaction})
-                            messages.error(request, f"Check your internet connection and confirm if {phone_number} "
-                                                    f"is your mobile payment number.")
+                            else:
+                                transaction.merchant_request_id = response.requestId
+                                transaction.response_description = response.errorMessage
+                                transaction.save()
 
-                            return redirect("pay_fees:dashboard")
+                                messages.error(request, response.errorMessage)
+
+                                return redirect("pay_fees:dashboard")
                         except Exception as error:
                             # messages.error(request, error)
                             # return redirect("pay_fees:dashboard")
