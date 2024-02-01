@@ -426,7 +426,7 @@ def confirm_pay(request, id):
                             amount = transaction.amount
                             account_reference = 'reference'
                             transaction_desc = 'Description'
-                            callback_url = 'https://darajambili.herokuapp.com/express-payment'
+                            callback_url = 'https://paymyfees.onrender.com/process_pay/{{ transaction.id }}/'
                             response = cl.stk_push(phone_number, amount, account_reference, transaction_desc, callback_url)
 
                             transaction.merchant_request_id = response.MerchantRequestID
