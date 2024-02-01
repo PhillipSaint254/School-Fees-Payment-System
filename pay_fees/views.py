@@ -491,9 +491,13 @@ def process_pay(request, id):
                             json_data = request.json()
                             extract_data = json.loads(json_data)
 
-                            request_body = request.body
+                            # request_body = request.body
+                            data = {
+                                "transaction_code": transaction.transaction_code,
+                                "body": extract_data
+                            }
 
-                            return HttpResponse("Payment completion details", {"json_data": extract_data, "request_body": request_body})
+                            return JsonResponse({"data": data})
                         except ValueError:
                             return JsonResponse({"data": "JSON file not received."}, status=400)
                     else:
