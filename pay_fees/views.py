@@ -423,7 +423,7 @@ def confirm_pay(request, id):
                             cl = MpesaClient()
                             # Use a Safaricom phone number that you have access to, for you to be able to view the prompt.
                             phone_number = transaction.msisdn
-                            amount = transaction.amount
+                            amount = transaction.transaction_amount
                             account_reference = 'reference'
                             transaction_desc = 'Description'
                             callback_url = 'https://paymyfees.onrender.com/process_pay/{{ transaction.id }}/'
