@@ -443,8 +443,9 @@ def confirm_pay(request, id):
 
                             return redirect("pay_fees:dashboard")
                         except Exception as error:
-                            messages.error(request, error)
-                            return redirect("pay_fees:dashboard")
+                            # messages.error(request, error)
+                            # return redirect("pay_fees:dashboard")
+                            raise
                     messages.success(request, "You have successfully cancelled this transaction.")
                     return redirect("pay_fees:dashboard")
                 messages.error(request, "Form not submitted")
