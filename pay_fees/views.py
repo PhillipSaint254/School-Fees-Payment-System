@@ -430,25 +430,37 @@ def confirm_pay(request, id):
                             account_reference = 'reference'
                             transaction_desc = 'Description'
                             callback_url = f'https://paymyfees.onrender.com/process_pay/{transaction.id}/'
-                            response = cl.stk_push(phone_number, amount, account_reference, transaction_desc, callback_url)
-                            print("************************************************************")
+                            response_json = cl.stk_push(phone_number, amount, account_reference, transaction_desc, callback_url)
+
+                            # Parse the JSON response
+                            response = response_json.json()
                             print(response)
-                            print("************************************************************")
-                            # return HttpResponse(response)
-                            if response.ResponseCode == 0:
-                                transaction.checkout_request_id = response.CheckoutRequestID
-                                transaction.response_code = response.ResponseCode
-                                transaction.merchant_request_id = response.MerchantRequestID
-                                transaction.customer_message = response.CustomerMessage
-                                transaction.response_description = response.ResponseDescription
+
+                            response_code = response.get('ResponseCode', None)
+                            merchant_request_id = response.get("MerchantRequestID", None)
+                            checkout_request_id = response.get("CheckoutRequestID", None)
+                            response_description = response.get("ResponseDescription", None)
+                            customer_message = response.get("CustomerMessage", None)
+                            print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+                            print(f"response_code: {response_code}, merchant_id: {merchant_request_id}, checkout_response_id: "
+                                  f"{checkout_request_id}, response_description: {response_description}, "
+                                  f"customer_message: {customer_message}")
+                            print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+                            # return HttpResponse(response_json)
+                            if int(response_code) == 0:
+                                transaction.response_code = response_code
+                                transaction.checkout_request_id = checkout_request_id
+                                transaction.merchant_request_id = merchant_request_id
+                                transaction.customer_message = customer_message
+                                transaction.response_description = response_description
                                 transaction.save()
                                 return render(request, "complete pay.html", {"transaction": transaction})
                             else:
-                                transaction.merchant_request_id = response.requestId
-                                transaction.response_description = response.errorMessage
+                                transaction.merchant_request_id = response.get("requestId", None)
+                                transaction.response_description = response.get("errorMessage", None)
                                 transaction.save()
 
-                                messages.error(request, response.errorMessage)
+                                messages.error(request, f'Some error occurred: {response.get("errorMessage")}')
 
                                 return redirect("pay_fees:dashboard")
                         except Exception as error:

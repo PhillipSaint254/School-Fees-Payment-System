@@ -71,7 +71,9 @@
                             <li class="list-group-item">Then click complete to process payment.</li>
                             <form action="/process_pay/{{ transaction.id }}/" method="post">
                               {% csrf_token %}
-                              <input type="submit" class="btn btn-primary" value="complete">
+                              <div class="text-center mx-auto pt-2 pb-3">
+                                <input type="submit" class="btn btn-primary" value="complete">
+                              </div>
                             </form>
                           </ul>
                         </div>
