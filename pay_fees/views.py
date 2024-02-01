@@ -10,43 +10,43 @@ from django_daraja.mpesa.core import MpesaClient
 from pay_fees.models import default_now, School, Faculty, Course, Student, User, PaymentMethods, Transaction
 
 
-def index(request):
-    cl = MpesaClient()
-    # Use a Safaricom phone number that you have access to, for you to be able to view the prompt.
-    phone_number = '0742332937'
-    amount = 1
-    account_reference = 'reference'
-    transaction_desc = 'Description'
-    callback_url = 'https://darajambili.herokuapp.com/express-payment';
-    response = cl.stk_push(phone_number, amount, account_reference, transaction_desc, callback_url)
-    return HttpResponse(response)
-
-
 # def index(request):
-#     user = request.user
-#     if user.is_authenticated:
-#         if user.is_superuser:
-#             if request.method == "POST":
-#                 if request.POST.get("admin"):
-#                     return render(request, "admin index.html")
-#                 elif request.POST.get("staff"):
-#                     return render(request, "staff index.html")
-#                 elif request.POST.get("student"):
-#                     return render(request, "index.html", {"current_time": default_now()})
-#                 else:
-#                     messages.error(request, "Invalid choice, please select again.")
-#             return render(request, "admin login prompt.html")
-#         elif user.is_staff:
-#             if request.method == "POST":
-#                 if request.POST.get("staff"):
-#                     return render(request, "staff index.html")
-#                 elif request.POST.get("student"):
-#                     return render(request, "index.html", {"current_time": default_now()})
-#                 else:
-#                     messages.error(request, "Invalid choice, please select again.")
-#             return render(request, "staff login prompt.html")
-#         return render(request, "dashboard.html", {"current_time": default_now()})
-#     return render(request, "index.html", {"current_time": default_now()})
+#     cl = MpesaClient()
+#     # Use a Safaricom phone number that you have access to, for you to be able to view the prompt.
+#     phone_number = '0742332937'
+#     amount = 1
+#     account_reference = 'reference'
+#     transaction_desc = 'Description'
+#     callback_url = 'https://paymyfees.onrender.com/process_pay/7/'
+#     response = cl.stk_push(phone_number, amount, account_reference, transaction_desc, callback_url)
+#     return HttpResponse(response)
+
+
+def index(request):
+    user = request.user
+    if user.is_authenticated:
+        if user.is_superuser:
+            if request.method == "POST":
+                if request.POST.get("admin"):
+                    return render(request, "admin index.html")
+                elif request.POST.get("staff"):
+                    return render(request, "staff index.html")
+                elif request.POST.get("student"):
+                    return render(request, "index.html", {"current_time": default_now()})
+                else:
+                    messages.error(request, "Invalid choice, please select again.")
+            return render(request, "admin login prompt.html")
+        elif user.is_staff:
+            if request.method == "POST":
+                if request.POST.get("staff"):
+                    return render(request, "staff index.html")
+                elif request.POST.get("student"):
+                    return render(request, "index.html", {"current_time": default_now()})
+                else:
+                    messages.error(request, "Invalid choice, please select again.")
+            return render(request, "staff login prompt.html")
+        return render(request, "dashboard.html", {"current_time": default_now()})
+    return render(request, "index.html", {"current_time": default_now()})
 
 
 def admin_index(request):
@@ -429,10 +429,12 @@ def confirm_pay(request, id):
                             amount = int(transaction.transaction_amount)
                             account_reference = 'reference'
                             transaction_desc = 'Description'
-                            callback_url = 'https://paymyfees.onrender.com/process_pay/{{ transaction.id }}/'
+                            callback_url = f'https://paymyfees.onrender.com/process_pay/{transaction.id}/'
                             response = cl.stk_push(phone_number, amount, account_reference, transaction_desc, callback_url)
-
-
+                            print("************************************************************")
+                            print(response)
+                            print("************************************************************")
+                            # return HttpResponse(response)
                             if response.ResponseCode == 0:
                                 transaction.checkout_request_id = response.CheckoutRequestID
                                 transaction.response_code = response.ResponseCode
