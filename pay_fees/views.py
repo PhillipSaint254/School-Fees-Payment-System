@@ -101,8 +101,6 @@ def user_registration(request):
         school_input = request.POST["school-input"]
         course_input = request.POST["course-input"]
 
-        course = None
-
         print(f"{email} {password1} {password2} {reg_number} {phone} {course_input}")
 
         if not (reg_number and course_input and email and first_name and password1):
@@ -451,6 +449,36 @@ def confirm_pay(request, id):
                     return redirect("pay_fees:dashboard")
                 messages.error(request, "Form not submitted")
                 return redirect("pay_fees:dashboard")
+            messages.error(request, "Transaction already effected.")
+            return redirect("pay_fees:dashboard")
+        messages.error(request, "You are not authorized to make this transaction!")
+        return redirect("pay_fees:dashboard")
+    messages.error(request, "Access reserved to authenticated users!")
+    return redirect("pay_fees:login")
+
+
+def process_pay(request, id):
+    user = request.user
+    if user.is_authenticated:
+        transaction = Transaction.objects.get(id=id)
+        if transaction.student.user == user:
+            if not transaction.complete:
+                if request.method == "POST":
+                    if request.content_type == "application/json":
+                        try:
+                            json_data = request.json()
+                            extract_data = json.loads(json_data)
+
+                            request_body = request.body
+
+                            return HttpResponse("Payment completion details", {"json_data": extract_data, "request_body": request_body})
+                        except ValueError:
+                            return JsonResponse({"data": "JSON file not received."}, status=400)
+                    else:
+                        return JsonResponse({"data": "Expected JSON content type."}, status=400)
+
+                data = request.body
+                return HttpResponse("STK Push in Django👋", {"data": data})
             messages.error(request, "Transaction already effected.")
             return redirect("pay_fees:dashboard")
         messages.error(request, "You are not authorized to make this transaction!")

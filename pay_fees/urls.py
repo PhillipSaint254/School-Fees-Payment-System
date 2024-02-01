@@ -24,5 +24,6 @@ urlpatterns = [
     path("pay_fees/", views.pay_fees, name="pay_fees"),
     path("pay_fees/<int:id>/", views.handle_selected_payment_method, name="handle_selected_payment_method"),
     path("payment_details/<int:id>/", views.payment_details, name="payment_details"),
-    path('confirm_pay/<int:id>/', views.confirm_pay, name="confirm_pay")
+    path('confirm_pay/<int:id>/', views.confirm_pay, name="confirm_pay"),
+    path("process_pay/<int:id>/", views.process_pay, name="process_pay")
 ]
