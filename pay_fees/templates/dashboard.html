@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load post_tags %}
 
 {% block body %}
 <style>
@@ -42,6 +43,11 @@
   a {
     text-decoration: none;
   }
+
+  .schools-card {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
 </style>
 <p></p>
 <section class="bg-white full">
@@ -63,6 +69,7 @@
               </div>
             </div>
           </div>
+        </div>
         </div>
         <div class="row">
           <div class="col-12 col-md-8 col-lg-4 py-3">
@@ -110,20 +117,31 @@
             </div>
           </div>
           <div class="col-12 col-md-8 py-3">
-            <div class="card mb-4">
+            <div class="card mb-4 schools-card w-100">
               <div class="px-4">
                 <div class="row">
+                  <h3 class="text-center pt-2"><strong>Schools Registered with Us</strong></h3>
+                </div>
+                <div class="row">
                   {% for school in schools %}
-                  <div class="col py-3">
+                  <div class="col-12 col-sm-10 col-md-8 col-lg-6 py-3">
                     <div class="info-box">
                       <div class="card-body">
                         <h5 class="card-title">
-                          {{ school.name }}
+                          {{ school.school_head }}
                           <a href="/adm/add_products/">
                               <i class="fas fa-plus"></i> {{ school.date_of_registration.date }} <!-- Changed to vertical ellipsis -->
                           </a>
                         </h5>
-                        <p class="card-text">{{ school.school_head }}</p>
+                        {% if school.name %}
+                          {% with name_length=school.name|count_characters %}
+                              {% if name_length <= 25 %}
+                                  <p class="card-text">{{ school.name.capitalize }}</p>
+                              {% else %}
+                                  <p class="card-text">{{ school.school_code }}</p>
+                              {% endif %}
+                          {% endwith %}
+                        {% endif %}
                         <small>{{ school.student_numbers }} students</small>
                       </div>
                     </div>
