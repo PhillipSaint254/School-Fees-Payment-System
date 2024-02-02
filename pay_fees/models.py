@@ -124,6 +124,10 @@ class Faculty(models.Model):
     student_numbers = models.IntegerField(default=1000)
     faculty_code = models.CharField(max_length=15, null=True)
 
+    class Meta:
+        verbose_name = "Department"
+        verbose_name_plural = "Departments"
+
     def __str__(self):
         return f"{self.name} - {self.school.name}"
 

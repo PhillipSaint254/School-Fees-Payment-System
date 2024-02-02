@@ -1,5 +1,6 @@
 import json
 from django.db import IntegrityError
+from django.urls import reverse
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
@@ -45,7 +46,8 @@ def index(request):
                 else:
                     messages.error(request, "Invalid choice, please select again.")
             return render(request, "staff login prompt.html")
-        return render(request, "dashboard.html", {"current_time": default_now()})
+        schools = School.objects.all()
+        return render(request, "dashboard.html", {"current_time": default_now(), "schools": schools})
     return render(request, "index.html", {"current_time": default_now()})
 
 
@@ -320,7 +322,8 @@ def get_courses(request):
 def dashboard(request):
     user = request.user
     if user.is_authenticated:
-        return render(request, "dashboard.html")
+        schools = School.objects.all()
+        return render(request, "dashboard.html", {"current_time": default_now(), "schools": schools})
     messages.error(request, "Access reserved to authenticated users!")
     return redirect("pay_fees:login")
 
@@ -332,7 +335,9 @@ def pay_fees(request):
             student = Student.objects.get(user=user)
         except Student.DoesNotExist:
             messages.error(request, "Only students are allowed to make transactions")
-            return redirect("pay_fees:dashboard")
+            schools = School.objects.all()
+            redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+            return redirect(redirect_url)
 
         payment_options = PaymentMethods.objects.all()
         transaction = Transaction(student=student)
@@ -355,11 +360,17 @@ def handle_selected_payment_method(request, id):
                     transaction.save()
                     return render(request, "payment details.html", {"transaction": transaction})
                 messages.error(request, "No payment method selected")
-                return redirect("pay_fees:dashboard")
+                schools = School.objects.all()
+                redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+                return redirect(redirect_url)
             messages.error(request, "Transaction already effected.")
-            return redirect("pay_fees:dashboard")
+            schools = School.objects.all()
+            redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+            return redirect(redirect_url)
         messages.error(request, "You are not authorized to make this transaction!")
-        return redirect("pay_fees:dashboard")
+        schools = School.objects.all()
+        redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+        return redirect(redirect_url)
     messages.error(request, "Access reserved to authenticated users!")
     return redirect("pay_fees:login")
 
@@ -378,11 +389,17 @@ def payment_details(request, id):
                     transaction.save()
                     return render(request, "confirm pay.html", {"transaction": transaction})
                 messages.error(request, "Form not submitted")
-                return redirect("pay_fees:dashboard")
+                schools = School.objects.all()
+                redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+                return redirect(redirect_url)
             messages.error(request, "Transaction already effected.")
-            return redirect("pay_fees:dashboard")
+            schools = School.objects.all()
+            redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+            return redirect(redirect_url)
         messages.error(request, "You are not authorized to make this transaction!")
-        return redirect("pay_fees:dashboard")
+        schools = School.objects.all()
+        redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+        return redirect(redirect_url)
     messages.error(request, "Access reserved to authenticated users!")
     return redirect("pay_fees:login")
 
@@ -465,21 +482,35 @@ def confirm_pay(request, id):
 
                                     messages.error(request, f'Some error occurred: {response.get("errorMessage")}')
 
-                                    return redirect("pay_fees:dashboard")
+                                    schools = School.objects.all()
+                                    redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+                                    return redirect(redirect_url)
                             messages.error(request, "No transaction data received.")
-                            return redirect("pay_fees:dashboard")
+                            schools = School.objects.all()
+                            redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+                            return redirect(redirect_url)
                         except Exception as error:
-                            # messages.error(request, error)
-                            # return redirect("pay_fees:dashboard")
-                            raise
+                            messages.error(request, error)
+                            schools = School.objects.all()
+                            redirect_url = reverse(
+                                'pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+                            return redirect(redirect_url)
                     messages.success(request, "You have successfully cancelled this transaction.")
-                    return redirect("pay_fees:dashboard")
+                    schools = School.objects.all()
+                    redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+                    return redirect(redirect_url)
                 messages.error(request, "Form not submitted")
-                return redirect("pay_fees:dashboard")
+                schools = School.objects.all()
+                redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+                return redirect(redirect_url)
             messages.error(request, "Transaction already effected.")
-            return redirect("pay_fees:dashboard")
+            schools = School.objects.all()
+            redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+            return redirect(redirect_url)
         messages.error(request, "You are not authorized to make this transaction!")
-        return redirect("pay_fees:dashboard")
+        schools = School.objects.all()
+        redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+        return redirect(redirect_url)
     messages.error(request, "Access reserved to authenticated users!")
     return redirect("pay_fees:login")
 
@@ -511,8 +542,12 @@ def process_pay(request, id):
                 data = request.body
                 return HttpResponse("STK Push in Django👋", {"data": data})
             messages.error(request, "Transaction already effected.")
-            return redirect("pay_fees:dashboard")
+            schools = School.objects.all()
+            redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+            return redirect(redirect_url)
         messages.error(request, "You are not authorized to make this transaction!")
-        return redirect("pay_fees:dashboard")
+        schools = School.objects.all()
+        redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+        return redirect(redirect_url)
     messages.error(request, "Access reserved to authenticated users!")
     return redirect("pay_fees:login")

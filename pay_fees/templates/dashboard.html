@@ -2,6 +2,47 @@
 {% load static %}
 
 {% block body %}
+<style>
+  .info-box {
+    background-color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.46875rem 2.1875rem rgb(0 0 0 / 3%), 0 0.9375rem 1.40625rem rgb(0 0 0 / 3%), 0 0.25rem 0.53125rem rgb(0 0 0 / 5%), 0 0.125rem 0.1875rem rgb(0 0 0 / 3%);
+    padding: 1rem;
+    position: relative;
+  }
+
+  .info-box .card-body {
+    padding: 1.25rem;
+  }
+
+  .info-box .card-title {
+    font-size: 1rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .info-box .card-text {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0;
+  }
+
+  .info-box small {
+    font-size: 0.875rem;
+    color: #6c757d;
+  }
+
+  .info-icon {
+    font-size: 1rem; /* Adjust the size as needed */
+  }
+
+  a {
+    text-decoration: none;
+  }
+</style>
 <p></p>
 <section class="bg-white full">
     <div class="container">
@@ -71,18 +112,31 @@
           <div class="col-12 col-md-8 py-3">
             <div class="card mb-4">
               <div class="px-4">
-                <h1 class="text-center">Our Services</h1>
-                <p class="text-justify">Welcome, {{ user.get_short_name.capitalize }}, to our innovative online platform dedicated to revolutionizing fee payments! At our core, we strive to simplify and automate the entire fee payment process, offering unparalleled convenience and efficiency to our users.</p>
-                <p class="text-justify">Gone are the days of cumbersome manual payments. With our service, you can bid farewell to the hassles of traditional transactions. We've designed our platform to streamline every aspect of fee payments, ensuring a seamless and hassle-free experience for all users.</p>
-                <p class="text-justify">Security is paramount in everything we do. Rest assured, your transactions are safeguarded by state-of-the-art security measures at every step of the process. Your peace of mind is our top priority, and we spare no effort in ensuring the integrity and confidentiality of your financial data.</p>
-                <p class="text-justify">Navigating our platform is a breeze. Our user-friendly interface is crafted to cater to diverse needs, making the payment journey smooth and intuitive. Whether you're a student, parent, or institution, our platform is tailored to meet your unique requirements with ease and efficiency.</p>
-                <p class="text-justify">What sets us apart is our unwavering commitment to excellence and customer satisfaction. We understand the importance of trust in financial transactions, which is why we prioritize transparency, reliability, and personalized assistance.</p>
-                <p class="text-justify">Count on us to provide swift resolutions and dedicated support whenever you need it. Join us on this journey to experience the future of fee payments – effortless, secure, and tailored to your needs. Welcome to a new era of online fee management.</p>
+                <div class="row">
+                  {% for school in schools %}
+                  <div class="col py-3">
+                    <div class="info-box">
+                      <div class="card-body">
+                        <h5 class="card-title">
+                          {{ school.name }}
+                          <a href="/adm/add_products/">
+                              <i class="fas fa-plus"></i> {{ school.date_of_registration.date }} <!-- Changed to vertical ellipsis -->
+                          </a>
+                        </h5>
+                        <p class="card-text">{{ school.school_head }}</p>
+                        <small>{{ school.student_numbers }} students</small>
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
     </div>
 </section>
+
 
 {% endblock %}
