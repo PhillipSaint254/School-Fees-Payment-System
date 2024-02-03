@@ -207,8 +207,8 @@ class Transaction(models.Model):
     time_stamp = models.DateTimeField(default=default_now, null=True)
     payment_method = models.CharField(max_length=20, default="m-pesa")
     # Preprocessing data
-    merchant_request_id = models.CharField(max_length=50, null=True)
-    checkout_request_id = models.CharField(max_length=50, null=True)
+    merchant_request_id = models.CharField(max_length=100, null=True)
+    checkout_request_id = models.CharField(max_length=100, null=True)
     response_code = models.IntegerField(null=True)
     customer_message = models.CharField(max_length=250, null=True)
     response_description = models.CharField(max_length=250, null=True)

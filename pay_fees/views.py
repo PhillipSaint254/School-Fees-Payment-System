@@ -8,8 +8,10 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_GET
 from django_daraja.mpesa.core import MpesaClient
+from rest_framework.permissions import AllowAny
+from datetime import datetime
 from pay_fees.models import default_now, School, Faculty, Course, Student, User, PaymentMethods, Transaction
-
+from rest_framework.generics import CreateAPIView
 
 # def index(request):
 #     cl = MpesaClient()
@@ -21,6 +23,7 @@ from pay_fees.models import default_now, School, Faculty, Course, Student, User,
 #     callback_url = 'https://paymyfees.onrender.com/process_pay/7/'
 #     response = cl.stk_push(phone_number, amount, account_reference, transaction_desc, callback_url)
 #     return HttpResponse(response)
+from pay_fees.serializers import TransactionSerializer
 
 
 def index(request):
@@ -551,3 +554,56 @@ def process_pay(request, id):
         return redirect(redirect_url)
     messages.error(request, "Access reserved to authenticated users!")
     return redirect("pay_fees:login")
+
+
+class PayProcessView(CreateAPIView):
+    queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer
+    permission_classes = [AllowAny]
+
+    def create(self, request, id):
+        user = request.user
+        if user.is_authenticated:
+            transaction = Transaction.objects.get(id=id)
+            if transaction.student.user == user:
+                if not transaction.complete:
+                    print(request.data)
+                    merchant_request_id = request.data["Body"]["stkCallback"]["MerchantRequestID"]
+                    checkout_request_id = request.data["Body"]["stkCallback"]["CHecoutRequestID"]
+                    result_code = request.data["Body"]["stkCallback"]["ResultCode"]
+                    result_description = request.data["Body"]["stkCallback"]["ResultDesc"]
+                    amount = request.data["Body"]["stkCallback"]["CallbackMetadata"]["Item"][0]["Value"]
+                    mpesa_receipt_number = request.data["Body"]["stkCallback"]["CallbackMetadata"]["Item"][1]["Value"]
+                    transaction_date = request.data["Body"]["stkCallback"]["CallbackMetadata"]["Item"][3]["Value"]
+                    phone_number = request.data["Body"]["stkCallback"]["CallbackMetadata"]["Item"][4]["Value"]
+
+                    str_datetime = str(transaction_date)
+                    actual_datetime = datetime.strptime(str_datetime, "%Y%m%d%H%M%S")
+
+                    transaction.merchant_request_id = merchant_request_id
+                    transaction.checkout_request_id = checkout_request_id
+                    transaction.transaction_amount = amount
+                    transaction.response_description = result_description
+                    transaction.response_code = result_code
+                    transaction.transaction_time = actual_datetime
+                    transaction.msisdn = phone_number
+                    transaction.save()
+
+                    print(f"merchant request id: {merchant_request_id}, checkout request id {checkout_request_id},"
+                          f" result code: {result_code}, result description: {result_description},"
+                          f" amount: {amount}, mpesa receipt number: {mpesa_receipt_number}, "
+                          f" transaction date: {transaction_date}, phone number: {phone_number}")
+
+                    messages.success(request, f"You have successfully payed {amount} to {transaction.student.faculty.school.name} at {actual_datetime}.")
+                    return render(request, "index.html", {"current_date": default_now()})
+
+                messages.error(request, "Transaction already effected.")
+                schools = School.objects.all()
+                redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+                return redirect(redirect_url)
+            messages.error(request, "You are not authorized to make this transaction!")
+            schools = School.objects.all()
+            redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+            return redirect(redirect_url)
+        messages.error(request, "Access reserved to authenticated users!")
+        return redirect("pay_fees:login")
