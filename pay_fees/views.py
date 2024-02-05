@@ -567,7 +567,15 @@ class PayProcessView(CreateAPIView):
             transaction = Transaction.objects.get(id=id)
             if transaction.student.user == user:
                 if not transaction.complete:
+                    print()
+                    print()
+                    print("### REQUEST BODY ###")
+                    print("*******************************************")
                     print(request.data)
+                    print("*******************************************")
+                    print()
+                    print()
+                    print()
                     merchant_request_id = request.data["Body"]["stkCallback"]["MerchantRequestID"]
                     checkout_request_id = request.data["Body"]["stkCallback"]["CHecoutRequestID"]
                     result_code = request.data["Body"]["stkCallback"]["ResultCode"]
