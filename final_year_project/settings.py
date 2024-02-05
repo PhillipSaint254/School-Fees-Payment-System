@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-import os
+import os, dj_database_url
 from pathlib import Path
 from django.contrib.messages import constants as messages
 
@@ -34,7 +34,8 @@ SECRET_KEY = 'django-insecure-r8to%2qtcw(!2_mect%+r_q4@hn!5a!#(e@gl7f&tsf!wk+#($
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
+# ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
+ALLOWED_HOSTS = "*",
 
 
 # Application definition
@@ -93,6 +94,10 @@ DATABASES = {
     }
 }
 
+# EXTERNAL_DATABASE_PATH = "postgres://schoolfees_database_user:TN7B60qN0KeM9LJCOMqJf5v5lmVl3BJS@dpg-cn0e2hta73kc7391qgng-a.oregon-postgres.render.com/schoolfees_database"
+# DATABASES["default"] = dj_database_url.parse(EXTERNAL_DATABASE_PATH)
+
+DATABASES["default"] = os.environ.get("DATABASES")
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
