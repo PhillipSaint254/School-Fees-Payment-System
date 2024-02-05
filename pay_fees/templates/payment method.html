@@ -103,4 +103,18 @@
     });
 
 </script>
+
+<script>
+  $(document).ready(function() {
+    $('#paymentForm').submit(function(event) {
+      // Check if at least one radio button is checked
+      if (!$('input[name="paymentMethod"]:checked').length > 0) {
+        // If none is checked, prevent form submission
+        alert('Please select a payment option');
+        event.preventDefault();
+      }
+    });
+  });
+</script>
+
 {% endblock %}
