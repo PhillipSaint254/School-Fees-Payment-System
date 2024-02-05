@@ -415,36 +415,8 @@ def confirm_pay(request, id):
             if not transaction.complete:
                 if request.method == "POST":
                     if "yes" in request.POST:
-                        # "TransactionType": "Pay Bill",
-                        # "TransID": "RKTQDM7W6S",
-                        # "TransTime": "20191122063845",
-                        # "TransAmount": "10"
-                        # "BusinessShortCode": "600638",
-                        # "BillRefNumber": "invoice008",
-                        # "InvoiceNumber": "",
-                        # "OrgAccountBalance": ""
-                        # "ThirdPartyTransID": "",
-                        # "MSISDN": "25470****149",
-                        # "FirstName": "John",
-                        # "MiddleName": ""
-                        # "LastName": "Doe"
-
-                        # {"MerchantRequestID": "53e3-4aa8-9fe0-8fb5e4092cdd240016",
-                        #  "CheckoutRequestID": "ws_CO_01022024073918981742332937", "ResponseCode": "0",
-                        #  "ResponseDescription": "Success. Request accepted for processing",
-                        #  "CustomerMessage": "Success. Request accepted for processing"}
-
-                        # {"requestId": "be17-4b49-886b-71ba6eedc4f2271737", "errorCode": "500.001.1001",
-                        #  "errorMessage": "Unable to lock subscriber, a transaction is already in process for the current subscriber"}
-
-                        # merchant_request_id = models.CharField(max_length=50, null=True)
-                        # checkout_request_id = models.CharField(max_length=50, null=True)
-                        # response_code = models.IntegerField(null=True)
-                        # customer_message = models.CharField(max_length=250, null=True)
-                        # response_description = models.CharField(max_length=250, null=True)
                         try:
                             cl = MpesaClient()
-                            # Use a Safaricom phone number that you have access to, for you to be able to view the prompt.
                             phone_number = transaction.msisdn
                             amount = int(transaction.transaction_amount)
                             account_reference = 'reference'
@@ -454,11 +426,20 @@ def confirm_pay(request, id):
 
                             # Parse the JSON response
                             response = response_json.json()
+                            response_code = response.get('ResponseCode', None)
+
                             print()
+                            print()
+                            print()
+                            print("### RESPONSE ###")
+                            print("*************************************************")
                             print(response)
+                            print(response_code)
+                            print("*************************************************")
+                            print()
+                            print()
                             print()
 
-                            response_code = response.get('ResponseCode', None)
                             if response_code:
                                 merchant_request_id = response.get("MerchantRequestID", None)
                                 checkout_request_id = response.get("CheckoutRequestID", None)
