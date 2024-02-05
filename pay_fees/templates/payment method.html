@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<style>
+    .payment-options {
+      display: block;
+    }
+
+    .payment-option {
+      background-color: #f2f2f2;
+      padding: 20px;
+      border-radius: 8px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .payment-option:hover {
+      background-color: #ddd;
+    }
+
+    .payment-option input[type="radio"] {
+      display: none;
+    }
+
+    .payment-option.selected {
+      background-color: #007bff;
+      color: #fff;
+    }
+
+    .payment-option.selected label {
+      font-weight: bold;
+    }
+
+</style>
+
+<section class="full">
+    <div class="container pt-5">
+        <div class="row">
+            <div class="col-12 col-md-10 col-lg-8 mx-auto">
+                <div class="row">
+                    <div class="col-10 col-md-8 col-lg-5 mx-auto">
+                        <div class="card">
+                          <div class="card-header">
+                            <h3 class="text-center">
+                                <strong>Transaction Details</strong>
+                            </h3>
+                          </div>
+                          <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Code: {{ transaction.transaction_code }}</li>
+                            <li class="list-group-item">ID: {{ transaction.id }}</li>
+                            <li class="list-group-item">Date: {{ transaction.time_stamp.date }}</li>
+                            <li class="list-group-item">TIme: {{ transaction.time_stamp.time }}</li>
+                          </ul>
+                        </div>
+                    </div>
+                    <div class="col-10 col-md-8 col-lg-7 mx-auto">
+                        <div class="card bg-white">
+                            <div class="card-header">
+                              <h3 class="text-center">
+                                <strong>Choose Payment Method</strong>
+                              </h3>
+                            </div>
+                            <div class="card-body">
+                                <form action="/pay_fees/{{ transaction.id }}/" method="POST" id="paymentForm" class="mx-4">
+                                  {% csrf_token %}
+                                  <div class="payment-options">
+                                    {% for option in payment_options %}
+                                        <div class="payment-option" data-value="{{ option.name }}">
+                                          <input type="radio" id="{{ option.pk }}" name="paymentMethod" value="{{ option.name }}">
+                                          <label for="{{ option.pk }}">{{ option.name }}</label>
+                                        </div>
+                                      {% endfor %}
+                                  </div>
+                                  <button type="submit" class="btn btn-primary btn-block mt-4">Pay Now</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const paymentOptions = document.querySelectorAll(".payment-option");
+
+      paymentOptions.forEach(option => {
+        option.addEventListener("click", function() {
+          // Unselect previously selected option
+          document.querySelectorAll(".payment-option").forEach(opt => {
+            opt.classList.remove("selected");
+          });
+
+          // Select the clicked option
+          option.classList.add("selected");
+        });
+      });
+    });
+
+</script>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block body %}
+
+<div class="container-fluid bg-faded full">
+    <div class="row">
+        <div class="col-sm-8 col-lg-6 mx-auto align-items-center justify-content-center">
+            <form action="" method="post">
+                {% csrf_token %}
+                <h3 class="display-4 text-center">Welcome. We noticed you are a staff. Where do you want to go?</h3>
+                <div class="d-flex justify-content-around">
+                    <input class="btn btn-primary btn-lg" type="submit" name="index" value="index" placeholder="Home page">
+                    <input class="btn btn-success btn-lg" type="submit" value="staff" name="staff" placeholder="Staff page">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

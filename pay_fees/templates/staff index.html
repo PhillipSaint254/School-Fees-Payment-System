@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Registration page{% endblock %}
+
+{% block burner %}
+
+{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        background-color: #f8f9fa; /* Light gray background */
+    }
+
+    .full {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .full-75 {
+        min-height: 75vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .sign-up-container {
+        max-width: 90vw;
+        padding: 20px;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        background-color: #ffffff;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .sign-up-container form {
+        margin-top: 15px;
+    }
+
+    .sign-up-container label {
+        font-weight: bold;
+    }
+
+    .email-input .sign-up-container input, .password-input .sign-up-container input {
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    .sign-up-container .form-check {
+        margin-bottom: 15px;
+    }
+
+    .submit-button {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        background-color: #007bff;
+        color: #ffffff;
+        cursor: pointer;
+    }
+
+    .submit-button:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<div class="container-fluid full-75">
+    <div class="row py-5">
+        <div class="sign-up-container col-10 col-sm-9 col-lg-8 mx-auto justify-content-center bg-white rounded w-100">
+            {% if messages %}
+                <ul>
+                {% for message in messages %}
+                    <li class="text-danger">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+            <div>
+                <h2 class="text-center">Registration Form</h2>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-12 col-md-8 col-lg-6 mb-3">
+                            <label for="first-name" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="first-name" name="first-name" aria-describedby="first-name-help">
+                            <div id="first-name-help" class="form-text">As per your national ID/Birth certificate.</div>
+                        </div>
+                        <div class="col-12 col-md-8 col-lg-6 mb-3">
+                            <label for="last-name" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="last-name" name="last-name" aria-describedby="last-name-help">
+                            <div id="last-name-help" class="form-text">As per your national ID/Birth certificate.</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-8 col-lg-6 mb-3">
+                            <label for="registration-number" class="form-label">Registration Number</label>
+                            <input type="tel" class="form-control" id="registration-number" name="registration-number" aria-describedby="registration-number-help">
+                            <div id="registration-number-help" class="form-text">Enter your registration number.</div>
+                        </div>
+                        <div class="col-12 col-md-8 col-lg-6 mb-3">
+                            <label for="last-name" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone-number" name="phone-number" aria-describedby="phone-number-help">
+                            <div id="phone-number-help" class="form-text">Enter your Safaricom line phone number.</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="exampleInputEmail1" name="email" aria-describedby="emailHelp">
+                            <div id="emailHelp" class="form-text">Enter your email.</div>
+                        </div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="exampleCheck2" onchange="registerStudent()">
+                        <label class="form-check-label" for="exampleCheck2">I am a student</label>
+                    </div>
+                    <div id="school-choice" style="display: none;">
+                        <div class="row">
+                            <div class="col-12">
+                                <h3 class="text-center">Select School</h3>
+                            </div>
+                        </div>
+                        {% if schools %}
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4">
+                          {% for school in schools %}
+                            <div class="col">
+                              <div class="info-box">
+                                <div class="card-body">
+                                  <h5 class="card-title">
+                                      {{ school.name }}
+                                    <a href="/adm/add_products/">
+                                        <i class="fas fa-plus"></i> Add <!-- Changed to vertical ellipsis -->
+                                    </a>
+                                  </h5>
+                                  <p class="card-text">{{ school.school_head }}</p>
+                                  <small>{{ school.student_numbers }} students</small>
+                                </div>
+                              </div>
+                            </div>
+                          {% endfor %}
+                        </div>
+                        {% else %}
+                            <p class="text-center text-danger py-3">No schools registered</p>
+                        {% endif %}
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-8 col-lg-6 mb-3">
+                            <label for="exampleInputPassword1" class="form-label">Set Password</label>
+                            <input type="password" class="form-control" name="password1" id="exampleInputPassword1">
+                        </div>
+                        <div class="col-12 col-md-8 col-lg-6 mb-3">
+                            <label for="exampleInputPassword2" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" name="password2" id="exampleInputPassword2">
+                        </div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="exampleCheck1" onchange="passwordViewRegister()">
+                        <label class="form-check-label" for="exampleCheck1">See Password</label>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-md-8 mb-3 mx-auto d-flex justify-content-center">
+                            <button type="submit" class="btn btn-primary text-center mx-auto submit-button">sign up</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function passwordViewRegister() {
+        var password1 = document.getElementById("exampleInputPassword1");
+        var password2 = document.getElementById("exampleInputPassword2");
+        var checkbox = document.getElementById("exampleCheck1");
+
+        if (checkbox.checked) {
+            password1.type = "text";
+            password2.type = "text";
+        } else {
+            password1.type = "password";
+            password2.type = "password";
+        }
+    }
+
+    function registerStudent() {
+        var schoolChoice = document.getElementById('school-choice');
+        if (schoolChoice.style.display === 'none') {
+            schoolChoice.style.display = 'block';
+        } else {
+            schoolChoice.style.display = 'none'; // Show the message
+        }
+      });
+</script>
+
+{% endblock %}

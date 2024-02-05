@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<style>
+    .add-school-wrapper {
+        width: 100%;
+        max-width: 90vw;
+        padding: 20px;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        background-color: #ffffff;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    .add-school-wrapper form {
+        margin-top: 15px;
+    }
+
+    .add-school-wrapper label {
+        font-weight: bold;
+    }
+
+     input-field input {
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+     input-field .form-check {
+        margin-bottom: 15px;
+    }
+
+    .submit-button {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        background-color: #007bff;
+        color: #ffffff;
+        cursor: pointer;
+    }
+
+    .submit-button:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="mx-auto col-12 col-sm-10 col-md-8 py-5">
+            <div class="add-school-wrapper bg-white">
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-12 py-3">
+                            <h1 class="text-center">Add School</h1>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-8 col-lg-6 mb-3 input-field">
+                            <label for="exampleInputEmail1" class="form-label">School Name</label>
+                            <input type="text" class="form-control" id="exampleInputEmail1" name="school-name" aria-describedby="school-name-help">
+                            <div id="school-name-help" class="form-text">Enter the name of the school.</div>
+                        </div>
+                        <div class="col-12 col-md-8 col-lg-6 mb-3 input-field">
+                            <label for="exampleInputEmail2" class="form-label">Head of School</label>
+                            <input type="text" class="form-control" id="exampleInputEmail2" name="head-of-school" aria-describedby="head-name-help">
+                            <div id="head-name-help" class="form-text">Enter the name of the head of school.</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-8 col-lg-6 mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Date of Registration</label>
+                            <input type="datetime-local" class="form-control" id="date-of-registration" name="date-of-registration" aria-describedby="date-of-registration-help">
+                            <div id="date-of-registration-help" class="form-text">Enter the name of the school.</div>
+                        </div>
+                        <div class="col-12 col-md-8 col-lg-6 mb-3">
+                            <label for="school-shortcode" class="form-label">School Shortcode</label>
+                            <input type="text" class="form-control" id="school-shortcode" name="school-shortcode" aria-describedby="shortcode-help">
+                            <div id="shortcode-help" class="form-text">Enter the school shortcode.</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-8 mb-3 mx-auto d-flex justify-content-center">
+                            <button type="submit" class="btn btn-primary text-center mx-auto submit-button">save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
