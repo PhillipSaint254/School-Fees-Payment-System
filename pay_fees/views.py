@@ -572,6 +572,7 @@ class PayProcessView(CreateAPIView):
                     print("### REQUEST BODY ###")
                     print("*******************************************")
                     print(request.data)
+                    print(request.body)
                     print("*******************************************")
                     print()
                     print()
