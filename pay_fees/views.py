@@ -359,7 +359,7 @@ def handle_selected_payment_method(request, id):
             if not transaction.complete:
                 if request.method == "POST":
                     payment_method = request.POST.get("paymentMethod", "")
-                    transaction.payment_method = payment_method
+                    transaction.payment_method = payment_method if payment_method else "m-pesa"
                     transaction.save()
                     return render(request, "payment details.html", {"transaction": transaction})
                 messages.error(request, "No payment method selected")
