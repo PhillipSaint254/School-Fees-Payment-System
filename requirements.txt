@@ -10,3 +10,4 @@ django-filter==22.1
 gspread==5.9.0
 oauth2client==4.1.3
 urllib3<2.0
+psycopg2==2.9.9
