@@ -148,7 +148,20 @@ def user_registration(request):
         if password1 == password2:
             try:
                 if course:
+                    user_id = 1
+                    last_user = User.objects.all().order_by("-id")[0]
+                    if last_user:
+                        user_id = last_user.id + 1
+
+                        while True:
+                            try:
+                                User.objects.get(user_id)
+                                user_id += 1
+                            except:
+                                break
+
                     user = User.objects.create(
+                        id=user_id,
                         email=email,
                         first_name=first_name,
                         last_name=last_name,
@@ -166,7 +179,20 @@ def user_registration(request):
 
                     user.save()
 
+                    student_id = 1
+                    last_student = Student.objects.all().order_by("-id")[0]
+                    if last_student:
+                        student_id = last_student.id + 1
+
+                        while True:
+                            try:
+                                Student.objects.get(student_id)
+                                student_id += 1
+                            except:
+                                break
+
                     student = Student.objects.create(
+                        id=student_id,
                         user=user,
                         course=course,
                         student_name=f"{first_name} {last_name}",
@@ -343,7 +369,19 @@ def pay_fees(request):
             return redirect(redirect_url)
 
         payment_options = PaymentMethods.objects.all()
-        transaction = Transaction(student=student)
+        transaction_id = 1
+
+        transaction = Transaction.objects.all().order_by("-id")
+        if transaction:
+            transaction_id = transaction[0].id + 1
+            while True:
+                try:
+                    Transaction.objects.get(transaction_id)
+                    transaction_id += 1
+                except:
+                    break
+
+        transaction = Transaction(id=transaction_id, student=student)
         transaction.transaction_amount = student.balance
         transaction.save()
         return render(request, "payment method.html", {"payment_options": payment_options, "transaction": transaction})
