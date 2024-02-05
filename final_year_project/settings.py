@@ -97,7 +97,7 @@ DATABASES = {
 # EXTERNAL_DATABASE_PATH = "postgres://schoolfees_database_user:TN7B60qN0KeM9LJCOMqJf5v5lmVl3BJS@dpg-cn0e2hta73kc7391qgng-a.oregon-postgres.render.com/schoolfees_database"
 # DATABASES["default"] = dj_database_url.parse(EXTERNAL_DATABASE_PATH)
 
-DATABASES["default"] = os.environ.get("DATABASES")
+DATABASES["default"] = dj_database_url.parse(os.environ.get("DATABASES"))
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
