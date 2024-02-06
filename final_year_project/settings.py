@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-r8to%2qtcw(!2_mect%+r_q4@hn!5a!#(e@gl7f&tsf!wk+#($'
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -165,7 +165,7 @@ MPESA_SHORTCODE_TYPE = 'paybill'
 # Sandbox passkey is available on test credentials page
 # Production passkey is sent via email once you go live
 
-MPESA_PASSKEY = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919'
+MPESA_PASSKEY = os.environ.get("MPESA_PASSKEY")
 
 # Username for initiator (to be used in B2C, B2B, AccountBalance and TransactionStatusQuery Transactions)
 

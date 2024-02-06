@@ -550,6 +550,14 @@ def process_pay(request, id):
                             extract_data = json.loads(json_data)
 
                             # request_body = request.body
+                            print()
+                            print()
+                            print("### RESPONSE DATA ###")
+                            print("***********************************************")
+                            print(request.data)
+                            print("***********************************************")
+                            print()
+                            print()
                             data = {
                                 "transaction_code": transaction.transaction_code,
                                 "body": extract_data
