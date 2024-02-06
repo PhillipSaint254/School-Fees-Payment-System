@@ -3,6 +3,7 @@ A school fees payment system where admins can register new users and schools, an
 Note that this project exists in two branches:
 - main
 - master
+
 The main branch contains this README markdown file to explain the code, but the actual code is found in the master branch.
 Note that if you clone this project directly to your system and run it in your local environment, it won't start as it requires some changes to start. 
 
