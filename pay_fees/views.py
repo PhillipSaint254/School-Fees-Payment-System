@@ -642,3 +642,14 @@ def test_api(request):
     print(request.body)
     print(request.POST)
     return HttpResponse(request.data)
+
+
+class TestAPIView(CreateAPIView):
+    queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer
+    permission_classes = [AllowAny]
+
+    def create(self, request):
+        print(request.body)
+        print(request.POST)
+        return HttpResponse(request.data)

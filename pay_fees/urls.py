@@ -26,5 +26,6 @@ urlpatterns = [
     path("payment_details/<int:id>/", views.payment_details, name="payment_details"),
     path('confirm_pay/<int:id>/', views.confirm_pay, name="confirm_pay"),
     path("process_pay/<int:id>/", views.PayProcessView.as_view(), name="process_pay"),
-    path("test_api/", views.test_api)
+    path("test_api/", views.test_api),
+    path("test_api_2/", views.TestAPIView.as_view())
 ]
