@@ -1,5 +1,6 @@
 # School-Fees-Payment-System
-A school fees payment system where admins can register new users and schools, and the registered users can use mobile payment options like mpesa to pay for their school fees. School fee payment is just a modeled proof of concept as this project can be used to implement mobile payment in other fields or applications.
+A school fees payment system where admins can register new users and schools, and the registered users can use mobile payment options like mpesa to pay for their school fees. School fee payment is just a modeled proof of concept as this project can be used to implement mobile payment in other fields or applications. Here is how this project looks like in a live server: https://paymyfees.onrender.com/
+
 Note that this project exists in two branches:
 - main
 - master
