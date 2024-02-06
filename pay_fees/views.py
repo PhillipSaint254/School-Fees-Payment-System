@@ -125,11 +125,11 @@ def user_registration(request):
             messages.error(request, "Please choose a valid school option.")
             return redirect("pay_fees:register")
 
-        # try:
-        #     Faculty.objects.get(id=faculty_input.split(":")[0])
-        # except:
-        #     messages.error(request, "Please choose a valid faculty option.")
-        #     return redirect("pay_fees:register")
+        try:
+            Faculty.objects.get(id=faculty_input.split(":")[0])
+        except:
+            messages.error(request, "Please choose a valid faculty option.")
+            return redirect("pay_fees:register")
 
         try:
             User.objects.get(registration_number=reg_number)

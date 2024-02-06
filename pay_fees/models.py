@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.utils import timezone
 from django.db import models
 from django.db.models.signals import post_save
@@ -159,14 +160,17 @@ def update_student_numbers(sender, instance, created, **kwargs):
         course = instance.course
         faculty = instance.course.faculty
         school = instance.course.faculty.school
+        print("course", course)
+        print("faculty", faculty)
+        print("school", school)
 
         course.student_numbers = Student.objects.filter(course=course).count()
         course.save()
 
-        faculty.student_numbers = Student.objects.filter(faculty=faculty).count()
+        faculty.student_numbers = Student.objects.filter(course__faculty=faculty).count()
         faculty.save()
 
-        school.student_numbers = Student.objects.filter(school=school).count()
+        school.student_numbers = Student.objects.filter(course__faculty__school=school).count()
         school.save()
 
 
