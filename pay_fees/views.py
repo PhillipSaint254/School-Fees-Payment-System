@@ -636,3 +636,9 @@ class PayProcessView(CreateAPIView):
             return redirect(redirect_url)
         messages.error(request, "Access reserved to authenticated users!")
         return redirect("pay_fees:login")
+
+
+def test_api(request):
+    print(request.body)
+    print(request.POST)
+    return HttpResponse(request.data)
