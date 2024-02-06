@@ -149,9 +149,9 @@ def user_registration(request):
             try:
                 if course:
                     user_id = 1
-                    last_user = User.objects.all().order_by("-id")[0]
+                    last_user = User.objects.all().order_by("-id")
                     if last_user:
-                        user_id = last_user.id + 1
+                        user_id = last_user[0].id + 1
 
                         while True:
                             try:
@@ -180,9 +180,9 @@ def user_registration(request):
                     user.save()
 
                     student_id = 1
-                    last_student = Student.objects.all().order_by("-id")[0]
+                    last_student = Student.objects.all().order_by("-id")
                     if last_student:
-                        student_id = last_student.id + 1
+                        student_id = last_student[0].id + 1
 
                         while True:
                             try:
