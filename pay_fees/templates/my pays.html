@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}My Transactions{% endblock %}
+
+{% block body %}
+
+<style>
+  .table-wrapper {
+    overflow-x: hidden;
+  }
+  .pill-success {
+    background-color: rgba(0, 100, 0, 0.5);
+  }
+  .pill-failure {
+    background-color: rgba(255, 0, 0, 0.75);
+  }
+</style>
+
+<div class="container">
+    <div class="row">
+      <div class="table-wrapper">
+        <table class="table align-middle mb-0 bg-white my-4">
+          <thead class="bg-light">
+            <tr>
+              <th>Name</th>
+              <th>Institution</th>
+              <th>Amount</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for transaction in my_transactions %}
+            <tr>
+              <td>
+                <div class="d-flex align-items-center">
+                  <img
+                      src="https://res.cloudinary.com/swiff-tech/image/upload/v1706871918/user_xgau4g.jpg"
+                      alt=""
+                      style="width: 45px; height: 45px"
+                      class="rounded-circle"
+                      />
+                  <div class="ms-3">
+                    <p class="fw-bold mb-1">{{ transaction.student.user.first_name }} {{ transaction.student.user.last_name }}</p>
+                    <p class="text-muted mb-0">{{ transaction.student.user.email }}</p>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <p class="fw-normal mb-1">{{ transaction.student.course.faculty.school.name }}</p>
+                <p class="text-muted mb-0">{{ transaction.student.course.faculty.name }}</p>
+              </td>
+              <td>{{ transaction.transaction_amount }}</td>
+              <td>{{ transaction.time_stamp.date }}</td>
+              <td>
+                {% if transaction.complete %}
+                <span class="badge pill-success rounded-pill">Complete</span>
+                {% else %}
+                <span class="badge pill-failure rounded-pill">Incomplete</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if not transaction.complete %}
+                <a href="/recover_transaction/{{ transaction.id }}/" type="button" class="btn btn-outline-primary btn-sm btn-rounded">
+                  Recover
+                </a>
+                {% else %}
+                <a href="#" type="button" class="btn btn-outline-primary btn-sm btn-rounded">
+                  Receipt
+                </a>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+</div>
+
+
+{% endblock %}

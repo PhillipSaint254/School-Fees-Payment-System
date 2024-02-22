@@ -661,3 +661,41 @@ class TestAPIView(CreateAPIView):
         print(request.body)
         print(request.POST)
         return HttpResponse(request.data)
+
+
+def my_transactions(request):
+    user = request.user
+    if user.is_authenticated:
+        try:
+            student = Student.objects.get(user=user)
+        except Student.DoesNotExist:
+            messages.error(request, "Only students are allowed to view transactions")
+            schools = School.objects.all()
+            redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+            return redirect(redirect_url)
+        _my_transactions = Transaction.objects.filter(student=student).order_by("-time_stamp")
+        return render(request, "my pays.html", {"my_transactions": _my_transactions, "account": student.course.faculty.school.name})
+    messages.error(request, "Access reserved to authenticated users!")
+    return redirect("pay_fees:login")
+
+
+def recover_transaction(request, id):
+    user = request.user
+    if user.is_authenticated:
+        transaction = Transaction.objects.get(id=id)
+        if transaction.student.user == user:
+            if not transaction.payment_method:
+                return render(request, "payment method.html", {"transaction": transaction})
+            if not transaction.transaction_amount or not transaction.msisdn:
+                return render(request, "payment details.html", {"transaction": transaction})
+            if not (transaction.merchant_request_id or transaction.checkout_request_id or
+                    transaction.response_description or transaction.customer_message):
+                return render(request, "confirm pay.html", {"transaction": transaction})
+            if not (transaction.merchant_request_id or transaction.response_description):
+                return render(request, "confirm pay.html", {"transaction": transaction})
+        messages.error(request, "You are not authorized to recover this transaction!")
+        schools = School.objects.all()
+        redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+        return redirect(redirect_url)
+    messages.error(request, "Access reserved to authenticated users!")
+    return redirect("pay_fees:login")
