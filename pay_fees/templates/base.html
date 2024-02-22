@@ -138,6 +138,27 @@
           font-size: 0.9rem;
           font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
         }
+        .login-wrapper {
+            display: flex;
+            justify-content: center;
+        }
+
+        /* CSS for the login and signup buttons */
+        .nav-item.px-3 {
+            margin-right: 0.5rem; /* Adjust margin as needed */
+        }
+
+        @media (max-width: 576px) {
+            /* Apply styles for small screens */
+            .login-wrapper {
+                max-width: 120px;
+                margin: 0 auto; /* Center the login wrapper */
+            }
+
+            .nav-item.px-3 {
+                margin-right: 0; /* Reset margin for small screens */
+            }
+        }
     </style>
     <title>{% block title %}School Fees Payment System{% endblock %}</title>
 </head>
@@ -179,12 +200,14 @@
                   <a class="nav-link signup-button bg-danger text-center text-white py-2" href="/logout/">Logout</a>
                 </li>
                 {% else %}
-                <li class="nav-item px-3">
-                  <a class="nav-link login-button bg-primary text-center active text-white py-2" aria-current="page" href="/login/">Login</a>
-                </li>
-                <li class="nav-item px-3">
-                  <a class="nav-link signup-button bg-warning text-center text-dark py-2" href="/register/">Sign Up</a>
-                </li>
+                <div class="login-wrapper">
+                    <li class="nav-item px-3">
+                      <a class="nav-link login-button bg-primary text-center active text-white py-2" aria-current="page" href="/login/">Login</a>
+                    </li>
+                    <li class="nav-item px-3">
+                      <a class="nav-link signup-button bg-warning text-center text-dark py-2" href="/register/">Sign Up</a>
+                    </li>
+                </div>
                 {% endif %}
             </ul>
         </div>
