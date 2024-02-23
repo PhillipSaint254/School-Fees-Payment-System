@@ -382,7 +382,6 @@ def pay_fees(request):
                     break
 
         transaction = Transaction(id=transaction_id, student=student)
-        transaction.transaction_amount = student.balance
         transaction.save()
         return render(request, "payment method.html", {"payment_options": payment_options, "transaction": transaction})
     messages.error(request, "Access reserved to authenticated users!")
@@ -425,7 +424,7 @@ def payment_details(request, id):
                 if request.method == "POST":
                     amount = request.POST["amount"]
                     phone = request.POST["phone-number"]
-                    transaction.transaction_amount = amount
+                    transaction.transaction_amount = amount if amount else transaction.student.balance
                     transaction.msisdn = phone
                     transaction.save()
                     return render(request, "confirm pay.html", {"transaction": transaction})

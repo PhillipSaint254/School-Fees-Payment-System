@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block body %}
+
 <style>
     body {
         background-color: #f8f9fa; /* Light gray background */
@@ -79,12 +80,12 @@
                     {% csrf_token %}
                     <div class="mb-3 email-input">
                         <label for="exampleInputEmail1" class="form-label">Amount</label>
-                        <input type="number" class="form-control" id="exampleInputEmail1" name="amount" value="{% if transaction.amount %}{{ transaction.amount }}{% else %}{{ transaction.student.balance }}{% endif %}" aria-describedby="emailHelp">
+                        <input type="number" class="form-control" id="exampleInputEmail1" name="amount" value="{% if transaction.amount %}{{ transaction.amount }}{% else %}{{ transaction.student.balance }}{% endif %}" aria-describedby="emailHelp" required>
                         <div id="emailHelp" class="form-text">Enter the amount you'd wish to pay.</div>
                     </div>
                     <div class="mb-3 email-input">
                         <label for="phone-number" class="form-label">Phone Number</label>
-                        <input type="tel" class="form-control" id="phone-number" name="phone-number" value="{{ user.phone }}" aria-describedby="phone-number-help">
+                        <input type="tel" class="form-control" id="phone-number" name="phone-number" value="{{ user.phone }}" aria-describedby="phone-number-help" required>
                         <div id="phone-number-help" class="form-text">Enter the phone number that will pay.</div>
                     </div>
                     <button type="submit" class="btn btn-primary">send</button>

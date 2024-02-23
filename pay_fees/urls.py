@@ -29,5 +29,5 @@ urlpatterns = [
     path("test_api/", views.test_api),
     path("test_api_2/", views.TestAPIView.as_view()),
     path('my_transactions/', views.my_transactions, name="my_transactions"),
-    path('recover_transaction_transactions/<int:id>/', views.recover_transaction, name="recover_transaction"),
+    path('recover_transaction/<int:id>/', views.recover_transaction, name="recover_transaction"),
 ]

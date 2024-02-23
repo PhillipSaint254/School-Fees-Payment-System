@@ -232,3 +232,14 @@ class PaymentMethods(models.Model):
 
     def __str__(self):
         return self.name.capitalize()
+
+
+# class Comment(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+#     username = models.CharField(max_length=50, default="Anonymous")
+#     comment = models.TextField()
+#     time_stamp = models.DateTimeField(default=default_now)
+#     state = models.CharField(max_length=15, default="Accepted")
+#
+#     def __str__(self):
+#         return f"{self.user.first_name} {self.user.last_name}" if self.user else self.username
