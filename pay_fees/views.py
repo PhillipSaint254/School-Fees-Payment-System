@@ -593,25 +593,15 @@ class PayProcessView(CreateAPIView):
             transaction = Transaction.objects.get(id=id)
             if transaction.student.user == user:
                 if not transaction.complete:
-                    print()
-                    print()
-                    print("### REQUEST BODY ###")
-                    print("*******************************************")
-                    print("Request data", dict(request.data))
-                    print("Request post", dict(request.POST))
-                    print("request body", request.body)
-                    print("*******************************************")
-                    print()
-                    print()
-                    print()
-                    merchant_request_id = request.data["Body"]["stkCallback"]["MerchantRequestID"]
-                    checkout_request_id = request.data["Body"]["stkCallback"]["CHecoutRequestID"]
-                    result_code = request.data["Body"]["stkCallback"]["ResultCode"]
-                    result_description = request.data["Body"]["stkCallback"]["ResultDesc"]
-                    amount = request.data["Body"]["stkCallback"]["CallbackMetadata"]["Item"][0]["Value"]
-                    mpesa_receipt_number = request.data["Body"]["stkCallback"]["CallbackMetadata"]["Item"][1]["Value"]
-                    transaction_date = request.data["Body"]["stkCallback"]["CallbackMetadata"]["Item"][3]["Value"]
-                    phone_number = request.data["Body"]["stkCallback"]["CallbackMetadata"]["Item"][4]["Value"]
+                    data = request.data
+                    merchant_request_id = data["Body"]["stkCallback"]["MerchantRequestID"]
+                    checkout_request_id = data["Body"]["stkCallback"]["CHecoutRequestID"]
+                    result_code = data["Body"]["stkCallback"]["ResultCode"]
+                    result_description = data["Body"]["stkCallback"]["ResultDesc"]
+                    amount = data["Body"]["stkCallback"]["CallbackMetadata"]["Item"][0]["Value"]
+                    mpesa_receipt_number = data["Body"]["stkCallback"]["CallbackMetadata"]["Item"][1]["Value"]
+                    transaction_date = data["Body"]["stkCallback"]["CallbackMetadata"]["Item"][3]["Value"]
+                    phone_number = data["Body"]["stkCallback"]["CallbackMetadata"]["Item"][4]["Value"]
 
                     str_datetime = str(transaction_date)
                     actual_datetime = datetime.strptime(str_datetime, "%Y%m%d%H%M%S")
