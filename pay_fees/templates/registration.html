@@ -178,7 +178,7 @@
                     <div class="row" id="school-choice">
                         <div class="col-12 mb-3">
                             <label for="school-input" class="form-label">Institution</label>
-                            <input type="text" class="form-control" id="school-input" name="school-input" oninput="filterSchools(this.value)" aria-describedby="school-help" placeholder="Type your institution name" required>
+                            <input type="text" class="form-control" id="school-input" name="school-input" oninput="filterSchools(this.value)" aria-describedby="school-help" placeholder="Type your institution name">
                             <div id="school-help" class="form-text">Choose your institution.</div>
                             <div id="school-options" class="select-options select-hide"></div>
                         </div>
@@ -186,13 +186,13 @@
                     <div class="row">
                         <div class="col-12 col-md-8 col-lg-6 mb-3" id="faculty-choice">
                             <label for="school-input" class="form-label">Department</label>
-                            <input type="text" class="form-control" id="faculty-input" name="faculty-input" oninput="filterFaculties(this.value)" disabled aria-describedby="school-help" placeholder="Type your department name" required>
+                            <input type="text" class="form-control" id="faculty-input" name="faculty-input" oninput="filterFaculties(this.value)" disabled aria-describedby="school-help" placeholder="Type your department name">
                             <div id="faculty-help" class="form-text">Choose your department.</div>
                             <div id="faculty-options" class="select-faculty-options select-hide"></div>
                         </div>
                         <div class="col-12 col-md-8 col-lg-6 mb-3" id="course-choice">
                             <label for="school-input" class="form-label">Course</label>
-                            <input type="text" class="form-control" id="course-input" name="course-input" oninput="filterCourses(this.value)" disabled aria-describedby="course-help" placeholder="Type your course name" required>
+                            <input type="text" class="form-control" id="course-input" name="course-input" oninput="filterCourses(this.value)" disabled aria-describedby="course-help" placeholder="Type your course name">
                             <div id="course-help" class="form-text">Choose your course.</div>
                             <div id="course-options" class="select-options select-hide"></div>
                         </div>
@@ -213,8 +213,11 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-12 col-md-8 mb-3 mx-auto d-flex justify-content-center">
-                            <button type="submit" class="btn btn-primary text-center mx-auto submit-button">sign up</button>
+                        <div class="col-12 col-md-8 col-lg-6 mb-3">
+                            <button type="submit" value="register-student" class="btn btn-primary text-center mx-auto submit-button">register student</button>
+                        </div>
+                        <div class="col-12 col-md-8 col-lg-6 mb-3">
+                            <button type="submit" value="register-parent" class="btn btn-success text-center mx-auto submit-button">register parent</button>
                         </div>
                     </div>
                 </form>
