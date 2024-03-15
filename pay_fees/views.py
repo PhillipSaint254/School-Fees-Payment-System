@@ -496,16 +496,16 @@ def confirm_pay(request, id):
                                     transaction.response_description = response_description
                                     transaction.save()
                                     return render(request, "complete pay.html", {"transaction": transaction})
-                                else:
-                                    transaction.merchant_request_id = response.get("requestId", None)
-                                    transaction.response_description = response.get("errorMessage", None)
-                                    transaction.save()
+                            else:
+                                transaction.merchant_request_id = response.get("requestId", None)
+                                transaction.response_description = response.get("errorMessage", None)
+                                transaction.save()
 
-                                    messages.error(request, f'Some error occurred: {response.get("errorMessage")}')
+                                messages.error(request, f'Some error occurred: {response.get("errorMessage")}')
 
-                                    schools = School.objects.all()
-                                    redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
-                                    return redirect(redirect_url)
+                                schools = School.objects.all()
+                                redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+                                return redirect(redirect_url)
                             messages.error(request, "No transaction data received.")
                             schools = School.objects.all()
                             redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
