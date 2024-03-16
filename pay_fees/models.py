@@ -234,6 +234,15 @@ class PaymentMethods(models.Model):
         return self.name.capitalize()
 
 
+class Parent(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="Parent")
+    student = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="Student")
+    parent_name = models.CharField(max_length=50, null=True)
+
+    def __str__(self):
+        return self.parent_name
+
+
 # class Comment(models.Model):
 #     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 #     username = models.CharField(max_length=50, default="Anonymous")
