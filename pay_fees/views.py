@@ -108,44 +108,45 @@ def user_registration(request):
 
         print(f"{email} {password1} {password2} {reg_number} {phone} {course_input}")
 
-        if not (reg_number and course_input and email and first_name and password1):
-            messages.error(request, "All fields required!")
-            return redirect("pay_fees:register")
-
-        try:
-            User.objects.get(email=email)
-            messages.error(request, f"User with the email '{email}' already exists.")
-            return redirect("pay_fees:register")
-        except:
-            pass
-
-        try:
-            School.objects.get(id=school_input.split(":")[0])
-        except:
-            messages.error(request, "Please choose a valid school option.")
-            return redirect("pay_fees:register")
-
-        try:
-            Faculty.objects.get(id=faculty_input.split(":")[0])
-        except:
-            messages.error(request, "Please choose a valid faculty option.")
-            return redirect("pay_fees:register")
-
-        try:
-            User.objects.get(registration_number=reg_number)
-            messages.error(request, f"User with the registration number '{email}' already exists.")
-            return redirect("pay_fees:register")
-        except:
-            pass
-
-        try:
-            course_id = course_input.split(":")[0]
-            course = Course.objects.get(id=course_id)
-        except:
-            messages.error(request, "Please choose a valid course option.")
-            return redirect("pay_fees:register")
-
         if password1 == password2:
+
+            if not (reg_number and course_input and email and first_name and password1):
+                messages.error(request, "All fields required!")
+                return redirect("pay_fees:register")
+
+            try:
+                User.objects.get(email=email)
+                messages.error(request, f"User with the email '{email}' already exists.")
+                return redirect("pay_fees:register")
+            except:
+                pass
+
+            try:
+                School.objects.get(id=school_input.split(":")[0])
+            except:
+                messages.error(request, "Please choose a valid school option.")
+                return redirect("pay_fees:register")
+
+            try:
+                Faculty.objects.get(id=faculty_input.split(":")[0])
+            except:
+                messages.error(request, "Please choose a valid faculty option.")
+                return redirect("pay_fees:register")
+
+            try:
+                User.objects.get(registration_number=reg_number)
+                messages.error(request, f"User with the registration number '{email}' already exists.")
+                return redirect("pay_fees:register")
+            except:
+                pass
+
+            try:
+                course_id = course_input.split(":")[0]
+                course = Course.objects.get(id=course_id)
+            except:
+                messages.error(request, "Please choose a valid course option.")
+                return redirect("pay_fees:register")
+
             try:
                 if course:
                     user_id = 1
@@ -179,26 +180,31 @@ def user_registration(request):
 
                     user.save()
 
-                    student_id = 1
-                    last_student = Student.objects.all().order_by("-id")
-                    if last_student:
-                        student_id = last_student[0].id + 1
+                    if "register-parent" in request.POST:
+                        """Parent registration"""
+                        pass
+                    elif "register-student" in request.POST:
+                        """Student registration"""
+                        student_id = 1
+                        last_student = Student.objects.all().order_by("-id")
+                        if last_student:
+                            student_id = last_student[0].id + 1
 
-                        while True:
-                            try:
-                                Student.objects.get(student_id)
-                                student_id += 1
-                            except:
-                                break
+                            while True:
+                                try:
+                                    Student.objects.get(student_id)
+                                    student_id += 1
+                                except:
+                                    break
 
-                    student = Student.objects.create(
-                        id=student_id,
-                        user=user,
-                        course=course,
-                        student_name=f"{first_name} {last_name}",
-                        balance=course.fees
-                    )
-                    student.save()
+                        student = Student.objects.create(
+                            id=student_id,
+                            user=user,
+                            course=course,
+                            student_name=f"{first_name} {last_name}",
+                            balance=course.fees
+                        )
+                        student.save()
 
                     if user is not None:
                         login(request, user)
