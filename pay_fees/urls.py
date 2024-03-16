@@ -18,6 +18,7 @@ urlpatterns = [
     path("user_admin/", include(admin_urls)),
     path("logout/", views.user_logout, name="logout"),
     path("get_all_schools/", views.all_school, name="all_schools"),
+    path("get_all_students/", views.get_all_students, name="get_all_students"),
     path('get_faculties/', views.get_faculties, name='get_faculties'),
     path('get_courses/', views.get_courses, name='get_courses'),
     path("dashboard/", views.dashboard, name="dashboard"),
@@ -30,4 +31,5 @@ urlpatterns = [
     path("test_api_2/", views.TestAPIView.as_view()),
     path('my_transactions/', views.my_transactions, name="my_transactions"),
     path('recover_transaction/<int:id>/', views.recover_transaction, name="recover_transaction"),
+    path("my_student/", views.my_student, name="my_student")
 ]

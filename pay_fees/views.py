@@ -10,7 +10,7 @@ from django.views.decorators.http import require_GET
 from django_daraja.mpesa.core import MpesaClient
 from rest_framework.permissions import AllowAny
 from datetime import datetime
-from pay_fees.models import default_now, School, Faculty, Course, Student, User, PaymentMethods, Transaction
+from pay_fees.models import default_now, School, Faculty, Course, Student, User, PaymentMethods, Transaction, Parent
 from rest_framework.generics import CreateAPIView
 
 # def index(request):
@@ -108,12 +108,12 @@ def user_registration(request):
 
         print(f"{email} {password1} {password2} {reg_number} {phone} {course_input}")
 
-        if password1 == password2:
-
+        def check_reg():
             if not (reg_number and course_input and email and first_name and password1):
                 messages.error(request, "All fields required!")
                 return redirect("pay_fees:register")
 
+        def check_email():
             try:
                 User.objects.get(email=email)
                 messages.error(request, f"User with the email '{email}' already exists.")
@@ -121,6 +121,7 @@ def user_registration(request):
             except:
                 pass
 
+        def check_student_details():
             try:
                 School.objects.get(id=school_input.split(":")[0])
             except:
@@ -142,49 +143,56 @@ def user_registration(request):
 
             try:
                 course_id = course_input.split(":")[0]
-                course = Course.objects.get(id=course_id)
+                return Course.objects.get(id=course_id)
             except:
                 messages.error(request, "Please choose a valid course option.")
                 return redirect("pay_fees:register")
 
+        check_email()
+
+        if password1 == password2:
+
             try:
-                if course:
-                    user_id = 1
-                    last_user = User.objects.all().order_by("-id")
-                    if last_user:
-                        user_id = last_user[0].id + 1
+                user_id = 1
+                last_user = User.objects.all().order_by("-id")
+                if last_user:
+                    user_id = last_user[0].id + 1
 
-                        while True:
-                            try:
-                                User.objects.get(user_id)
-                                user_id += 1
-                            except:
-                                break
+                    while True:
+                        try:
+                            User.objects.get(user_id)
+                            user_id += 1
+                        except:
+                            break
 
-                    user = User.objects.create(
-                        id=user_id,
-                        email=email,
-                        first_name=first_name,
-                        last_name=last_name,
-                        registration_number=reg_number,
-                        phone=phone,
-                    )
+                user = User.objects.create(
+                    id=user_id,
+                    email=email,
+                    first_name=first_name,
+                    last_name=last_name,
+                    registration_number=reg_number,
+                    phone=phone,
+                )
 
-                    if middle_name:
-                        user.middle_name = middle_name
+                if middle_name:
+                    user.middle_name = middle_name
 
-                    if id_number:
-                        user.id_number = id_number
+                if id_number:
+                    user.id_number = id_number
 
-                    user.set_password(password1)
+                user.set_password(password1)
 
-                    user.save()
+                user.save()
 
-                    if "register-parent" in request.POST:
-                        """Parent registration"""
-                        pass
-                    elif "register-student" in request.POST:
-                        """Student registration"""
+                if "register-parent" in request.POST:
+                    """Parent registration"""
+                    return render(request, "select student.html")
+
+                elif "register-student" in request.POST:
+                    """Student registration"""
+                    check_reg()
+                    course = check_student_details()
+                    if course:
                         student_id = 1
                         last_student = Student.objects.all().order_by("-id")
                         if last_student:
@@ -352,6 +360,12 @@ def get_courses(request):
         return JsonResponse({'courses': course_names})
     else:
         return JsonResponse({'error': 'Invalid school ID or faculty name'}, status=400)
+
+
+def get_all_students(request):
+    students = Student.objects.all().order_by("student_name")
+    student_names = [f"{student.id}: {student.user.get_full_name().capitalize()}" for student in students]
+    return JsonResponse({"students": student_names})
 
 
 def dashboard(request):
@@ -694,5 +708,29 @@ def recover_transaction(request, id):
         schools = School.objects.all()
         redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
         return redirect(redirect_url)
+    messages.error(request, "Access reserved to authenticated users!")
+    return redirect("pay_fees:login")
+
+
+def my_student(request):
+    user = request.user
+    if user.is_authenticated:
+        if request.method == "POST":
+            student_name = request.POST["student-name"].split(": ")[-1].strip().lower()
+            student_reg = request.POST["student-reg"]
+
+            _user = User.objects.get(get_full_name=student_name)
+
+            if _user.registration_number == student_reg:
+                Parent.objects.create(
+                    user=user,
+                    student=_user.student,
+                    parent_name=user.get_full_name()
+                ).save()
+                messages.success(request, f"You have registered as {_user.get_full_name()}'s parent.")
+                return render(request, "index.html", {"current_date": default_now()})
+            messages.success(request,
+                             f"The student name you entered does not match the registration number you specified.")
+        return render(request, "select student.html")
     messages.error(request, "Access reserved to authenticated users!")
     return redirect("pay_fees:login")
