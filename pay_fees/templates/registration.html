@@ -119,6 +119,20 @@
     }
 </style>
 
+<style>
+    form .closed {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease-out;
+    }
+
+    form .opened {
+        max-height: 1000px; /* Adjust max-height to accommodate your content */
+        transition: max-height 0.5s ease-in;
+    }
+
+
+</style>
 
 <div class="container-fluid full-75">
     <div class="row py-5">
@@ -153,11 +167,6 @@
                     </div>
                     <div class="row">
                         <div class="col-12 col-md-8 col-lg-4 mb-3">
-                            <label for="registration-number" class="form-label">Registration Number</label>
-                            <input type="text" class="form-control" id="registration-number" name="registration-number" aria-describedby="registration-number-help" required>
-                            <div id="registration-number-help" class="form-text">Enter your registration number.</div>
-                        </div>
-                        <div class="col-12 col-md-8 col-lg-4 mb-3">
                             <label for="id-number" class="form-label">ID Number</label>
                             <input type="tel" class="form-control" id="id-number" name="id-number" aria-describedby="id-number-help" required>
                             <div id="id-number-help" class="form-text">Optional field.</div>
@@ -169,42 +178,53 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-12 mb-3">
+                        <div class="col-12 col-md-8 col-lg-12 mb-3">
                             <label for="exampleInputEmail1" class="form-label">Email Address</label>
                             <input type="email" class="form-control" id="exampleInputEmail1" name="email" aria-describedby="emailHelp" required>
                             <div id="emailHelp" class="form-text">Enter your email.</div>
                         </div>
                     </div>
-                    <div class="row" id="school-choice">
-                        <div class="col-12 mb-3">
-                            <label for="school-input" class="form-label">Institution</label>
-                            <input type="text" class="form-control" id="school-input" name="school-input" oninput="filterSchools(this.value)" aria-describedby="school-help" placeholder="Type your institution name">
-                            <div id="school-help" class="form-text">Choose your institution.</div>
-                            <div id="school-options" class="select-options select-hide"></div>
+                    <p id="student-selection">
+                        Fill in student details
+                        <span class="arrow"><i class="fa fa-angle-down" aria-hidden="true"></i></span>
+                    </p>
+                    <div class="closed" id="select-student-switch">
+                        <div class="row">
+                            <div class="col-12 col-md-8 col-lg-6 mb-3">
+                                <label for="registration-number" class="form-label">Registration Number</label>
+                                <input type="text" class="form-control" id="registration-number" name="registration-number" aria-describedby="registration-number-help">
+                                <div id="registration-number-help" class="form-text">Enter your registration number.</div>
+                            </div>
+                            <div class="col-12 col-md-8 col-lg-6 mb-3" id="school-choice">
+                                <label for="school-input" class="form-label">Institution</label>
+                                <input type="text" class="form-control" id="school-input" name="school-input" oninput="filterSchools(this.value)" aria-describedby="school-help" placeholder="Type your institution name">
+                                <div id="school-help" class="form-text">Choose your institution.</div>
+                                <div id="school-options" class="select-options select-hide"></div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-md-8 col-lg-6 mb-3" id="faculty-choice">
-                            <label for="school-input" class="form-label">Department</label>
-                            <input type="text" class="form-control" id="faculty-input" name="faculty-input" oninput="filterFaculties(this.value)" disabled aria-describedby="school-help" placeholder="Type your department name">
-                            <div id="faculty-help" class="form-text">Choose your department.</div>
-                            <div id="faculty-options" class="select-faculty-options select-hide"></div>
-                        </div>
-                        <div class="col-12 col-md-8 col-lg-6 mb-3" id="course-choice">
-                            <label for="school-input" class="form-label">Course</label>
-                            <input type="text" class="form-control" id="course-input" name="course-input" oninput="filterCourses(this.value)" disabled aria-describedby="course-help" placeholder="Type your course name">
-                            <div id="course-help" class="form-text">Choose your course.</div>
-                            <div id="course-options" class="select-options select-hide"></div>
+                        <div class="row">
+                            <div class="col-12 col-md-8 col-lg-6 mb-3" id="faculty-choice">
+                                <label for="school-input" class="form-label">Department</label>
+                                <input type="text" class="form-control" id="faculty-input" name="faculty-input" oninput="filterFaculties(this.value)" disabled aria-describedby="school-help" placeholder="Type your department name">
+                                <div id="faculty-help" class="form-text">Choose your department.</div>
+                                <div id="faculty-options" class="select-faculty-options select-hide"></div>
+                            </div>
+                            <div class="col-12 col-md-8 col-lg-6 mb-3" id="course-choice">
+                                <label for="school-input" class="form-label">Course</label>
+                                <input type="text" class="form-control" id="course-input" name="course-input" oninput="filterCourses(this.value)" disabled aria-describedby="course-help" placeholder="Type your course name">
+                                <div id="course-help" class="form-text">Choose your course.</div>
+                                <div id="course-options" class="select-options select-hide"></div>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-12 col-md-8 col-lg-6 mb-3">
                             <label for="exampleInputPassword1" class="form-label">Set Password</label>
-                            <input type="password" class="form-control" name="password1" id="exampleInputPassword1" disabled required>
+                            <input type="password" class="form-control" name="password1" id="exampleInputPassword1" required>
                         </div>
                         <div class="col-12 col-md-8 col-lg-6 mb-3">
                             <label for="exampleInputPassword2" class="form-label">Confirm Password</label>
-                            <input type="password" class="form-control" name="password2" id="exampleInputPassword2" disabled required>
+                            <input type="password" class="form-control" name="password2" id="exampleInputPassword2" required>
                         </div>
                     </div>
                     <div class="mb-3 form-check">
@@ -244,6 +264,10 @@
 </script>
 
 <script>
+
+</script>
+
+<script>
     // Function to fetch schools from the server
     var facultyInput = document.getElementById("faculty-input");
     var courseInput = document.getElementById("course-input");
@@ -251,6 +275,32 @@
     var password2Input = document.getElementById("exampleInputPassword2");
     var selectedSchoolPK = -1;
     var selectdFacultyPK = -1;
+
+    document.getElementById("student-selection").addEventListener("click", function() {
+        var detailsDiv = document.getElementById("select-student-switch");
+        var arrowIcon = document.querySelector("#student-selection .arrow i");
+
+        if (detailsDiv.classList.contains("closed")) {
+            detailsDiv.classList.toggle("opened");
+            detailsDiv.classList.toggle("closed");
+
+            arrowIcon.classList.remove("fa-angle-down");
+            arrowIcon.classList.add("fa-angle-up");
+
+            password1Input.disabled = true;
+            password2Input.disabled = true;
+        } else {
+            detailsDiv.classList.toggle("opened");
+            detailsDiv.classList.toggle("closed");
+
+            arrowIcon.classList.remove("fa-angle-up");
+            arrowIcon.classList.add("fa-angle-down");
+
+            password1Input.disabled = false;
+            password2Input.disabled = false;
+        }
+
+    });
 
     function fetchSchools() {
         return fetch('/get_all_schools/')
@@ -275,11 +325,9 @@
                 console.error('Error fetching schools:', error);
             });
 
-            facultyInput.disabled = true;
             facultyInput.value = ""; // Reset faculty input
             courseInput.disabled = true; // Disable course input
             courseInput.value = "";
-            password1Input.disabled = true;
             password1Input.value = "";
             document.getElementById("faculty-options").innerHTML = ""; // Clear previous
     };
