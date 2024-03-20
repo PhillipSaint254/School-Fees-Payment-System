@@ -191,27 +191,27 @@
                     <div class="closed" id="select-student-switch">
                         <div class="row">
                             <div class="col-12 col-md-8 col-lg-6 mb-3">
-                                <label for="registration-number" class="form-label">Registration Number</label>
-                                <input type="text" class="form-control" id="registration-number" name="registration-number" aria-describedby="registration-number-help">
+                                <label for="registration_number" class="form-label">Registration Number</label>
+                                <input type="text" class="form-control" id="registration_number" name="registration-number" aria-describedby="registration-number-help">
                                 <div id="registration-number-help" class="form-text">Enter your registration number.</div>
                             </div>
                             <div class="col-12 col-md-8 col-lg-6 mb-3" id="school-choice">
-                                <label for="school-input" class="form-label">Institution</label>
-                                <input type="text" class="form-control" id="school-input" name="school-input" oninput="filterSchools(this.value)" aria-describedby="school-help" placeholder="Type your institution name">
+                                <label for="school_input" class="form-label">Institution</label>
+                                <input type="text" class="form-control" id="school_input" name="school-input" oninput="filterSchools(this.value)" aria-describedby="school-help" placeholder="Type your institution name">
                                 <div id="school-help" class="form-text">Choose your institution.</div>
                                 <div id="school-options" class="select-options select-hide"></div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-12 col-md-8 col-lg-6 mb-3" id="faculty-choice">
-                                <label for="school-input" class="form-label">Department</label>
-                                <input type="text" class="form-control" id="faculty-input" name="faculty-input" oninput="filterFaculties(this.value)" disabled aria-describedby="school-help" placeholder="Type your department name">
+                                <label for="fucalty_input" class="form-label">Department</label>
+                                <input type="text" class="form-control" id="fucalty_input" name="faculty-input" oninput="filterFaculties(this.value)" disabled aria-describedby="school-help" placeholder="Type your department name">
                                 <div id="faculty-help" class="form-text">Choose your department.</div>
                                 <div id="faculty-options" class="select-faculty-options select-hide"></div>
                             </div>
                             <div class="col-12 col-md-8 col-lg-6 mb-3" id="course-choice">
-                                <label for="school-input" class="form-label">Course</label>
-                                <input type="text" class="form-control" id="course-input" name="course-input" oninput="filterCourses(this.value)" disabled aria-describedby="course-help" placeholder="Type your course name">
+                                <label for="course_input" class="form-label">Course</label>
+                                <input type="text" class="form-control" id="course_input" name="course-input" oninput="filterCourses(this.value)" disabled aria-describedby="course-help" placeholder="Type your course name">
                                 <div id="course-help" class="form-text">Choose your course.</div>
                                 <div id="course-options" class="select-options select-hide"></div>
                             </div>
@@ -269,8 +269,8 @@
 
 <script>
     // Function to fetch schools from the server
-    var facultyInput = document.getElementById("faculty-input");
-    var courseInput = document.getElementById("course-input");
+    var facultyInput = document.getElementById("fucalty_input");
+    var courseInput = document.getElementById("course_input");
     var password1Input = document.getElementById("exampleInputPassword1");
     var password2Input = document.getElementById("exampleInputPassword2");
     var selectedSchoolPK = -1;
@@ -379,7 +379,7 @@
             fetchFaculties()
                 .then(faculties => {
                     // Once schools are fetched, store them and perform other actions
-                    var facultyInput = document.getElementById("faculty-input");
+                    var facultyInput = document.getElementById("fucalty_input");
                     facultyInput.setAttribute('data-faculty', JSON.stringify(faculties));
                 });
         }
@@ -402,7 +402,7 @@
         var facultyOptions = document.getElementById("faculty-options");
         facultyOptions.innerHTML = ""; // Clear previous options
 
-        var faculties = JSON.parse(document.getElementById("faculty-input").getAttribute('data-faculty'));
+        var faculties = JSON.parse(document.getElementById("fucalty_input").getAttribute('data-faculty'));
 
         if (input.trim() === "") {
             facultyOptions.classList.add("select-hide");
@@ -423,7 +423,7 @@
                     fetchCourses()
                         .then(courses => {
                             // Once schools are fetched, store them and perform other actions
-                            var courseInput = document.getElementById("course-input");
+                            var courseInput = document.getElementById("course_input");
                             courseInput.setAttribute('data-course', JSON.stringify(courses));
                         })
                         .catch(error => {
@@ -439,7 +439,7 @@
 
     // Function to enable course input when a faculty is selected
     function selectFaculty(faculty) {
-        var facultyInput = document.getElementById("faculty-input");
+        var facultyInput = document.getElementById("fucalty_input");
         facultyInput.value = faculty;
         selectedFacultyPK = faculty.split(":")[0];
         document.getElementById("faculty-options").classList.add("select-hide");
@@ -465,7 +465,7 @@
         var courseOptions = document.getElementById("course-options");
         courseOptions.innerHTML = ""; // Clear previous options
 
-        var courses = JSON.parse(document.getElementById("course-input").getAttribute('data-course'));
+        var courses = JSON.parse(document.getElementById("course_input").getAttribute('data-course'));
 
         if (input.trim() === "") {
             courseOptions.classList.add("select-hide");
@@ -493,7 +493,7 @@
 
     // Function to enable course input when a course is selected
     function selectCourse(course) {
-        var courseInput = document.getElementById("course-input");
+        var courseInput = document.getElementById("course_input");
         courseInput.value = course;
         document.getElementById("course-options").classList.add("select-hide");
         password1Input.disabled = false;
