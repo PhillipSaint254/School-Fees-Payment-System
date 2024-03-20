@@ -520,50 +520,60 @@ class PayProcessView(CreateAPIView):
 
     def create(self, request, id):
         user = request.user
-        if user.is_authenticated:
+        if not user.is_authenticated:
+            messages.error(request, "Access reserved to authenticated users!")
+            return redirect("pay_fees:login")
+
+        try:
             transaction = Transaction.objects.get(id=id)
-            if transaction.student.user == user:
-                if not transaction.complete:
-                    data = request.data
-                    merchant_request_id = data["Body"]["stkCallback"]["MerchantRequestID"]
-                    checkout_request_id = data["Body"]["stkCallback"]["CHecoutRequestID"]
-                    result_code = data["Body"]["stkCallback"]["ResultCode"]
-                    result_description = data["Body"]["stkCallback"]["ResultDesc"]
-                    amount = data["Body"]["stkCallback"]["CallbackMetadata"]["Item"][0]["Value"]
-                    mpesa_receipt_number = data["Body"]["stkCallback"]["CallbackMetadata"]["Item"][1]["Value"]
-                    transaction_date = data["Body"]["stkCallback"]["CallbackMetadata"]["Item"][3]["Value"]
-                    phone_number = data["Body"]["stkCallback"]["CallbackMetadata"]["Item"][4]["Value"]
+        except Transaction.DoesNotExist:
+            return JsonResponse({'error': 'Transaction not found.'}, status=404)
 
-                    str_datetime = str(transaction_date)
-                    actual_datetime = datetime.strptime(str_datetime, "%Y%m%d%H%M%S")
-
-                    transaction.merchant_request_id = merchant_request_id
-                    transaction.checkout_request_id = checkout_request_id
-                    transaction.transaction_amount = amount
-                    transaction.response_description = result_description
-                    transaction.response_code = result_code
-                    transaction.transaction_time = actual_datetime
-                    transaction.msisdn = phone_number
-                    transaction.save()
-
-                    print(f"merchant request id: {merchant_request_id}, checkout request id {checkout_request_id},"
-                          f" result code: {result_code}, result description: {result_description},"
-                          f" amount: {amount}, mpesa receipt number: {mpesa_receipt_number}, "
-                          f" transaction date: {transaction_date}, phone number: {phone_number}")
-
-                    messages.success(request, f"You have successfully payed {amount} to {transaction.student.faculty.school.name} at {actual_datetime}.")
-                    return render(request, "index.html", {"current_date": default_now()})
-
-                messages.error(request, "Transaction already effected.")
-                schools = School.objects.all()
-                redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
-                return redirect(redirect_url)
+        if transaction.student.user != user:
             messages.error(request, "You are not authorized to make this transaction!")
-            schools = School.objects.all()
+            schools = School.objects.all()  # Ensure you have defined School somewhere or adjust accordingly
             redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
             return redirect(redirect_url)
-        messages.error(request, "Access reserved to authenticated users!")
-        return redirect("pay_fees:login")
+
+        if transaction.complete:
+            messages.error(request, "Transaction already effected.")
+            schools = School.objects.all()  # Ensure you have defined School somewhere or adjust accordingly
+            redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+            return redirect(redirect_url)
+
+        data = request.data
+        try:
+            body = data["Body"]
+            stkCallback = body["stkCallback"]
+            merchant_request_id = stkCallback["MerchantRequestID"]
+            checkout_request_id = stkCallback["CheckoutRequestID"]  # Corrected typo
+            result_code = stkCallback["ResultCode"]
+            result_description = stkCallback["ResultDesc"]
+            callback_metadata = stkCallback["CallbackMetadata"]["Item"]
+            amount = next(item for item in callback_metadata if item["Name"] == "Amount")["Value"]
+            mpesa_receipt_number = next(item for item in callback_metadata if item["Name"] == "MpesaReceiptNumber")[
+                "Value"]
+            transaction_date = next(item for item in callback_metadata if item["Name"] == "TransactionDate")["Value"]
+            phone_number = next(item for item in callback_metadata if item["Name"] == "PhoneNumber")["Value"]
+
+            str_datetime = str(transaction_date)
+            actual_datetime = datetime.strptime(str_datetime, "%Y%m%d%H%M%S")
+
+            transaction.merchant_request_id = merchant_request_id
+            transaction.checkout_request_id = checkout_request_id
+            transaction.transaction_amount = amount
+            transaction.response_description = result_description
+            transaction.response_code = result_code
+            transaction.transaction_time = actual_datetime
+            transaction.msisdn = phone_number
+            transaction.save()
+
+            messages.success(request,
+                             f"You have successfully paid {amount} to {transaction.student.faculty.school.name} at {actual_datetime}.")
+            return render(request, "index.html", {"current_date": default_now()})
+
+        except KeyError as e:
+            return JsonResponse({'error': f'Missing data for: {str(e)}'}, status=400)
 
 
 def test_api(request):
