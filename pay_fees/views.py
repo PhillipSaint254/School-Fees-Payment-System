@@ -15,6 +15,7 @@ from rest_framework.permissions import AllowAny
 from datetime import datetime
 from pay_fees.models import default_now, School, Faculty, Course, Student, User, PaymentMethods, Transaction, Parent
 from rest_framework.generics import CreateAPIView
+from pay_fees.serializers import TransactionSerializer
 
 # def index(request):
 #     cl = MpesaClient()
@@ -26,7 +27,6 @@ from rest_framework.generics import CreateAPIView
 #     callback_url = 'https://paymyfees.onrender.com/process_pay/7/'
 #     response = cl.stk_push(phone_number, amount, account_reference, transaction_desc, callback_url)
 #     return HttpResponse(response)
-from pay_fees.serializers import TransactionSerializer
 
 
 def index(request):
@@ -46,7 +46,13 @@ def index(request):
         elif user.is_staff:
             if request.method == "POST":
                 if request.POST.get("staff"):
-                    return render(request, "staff index.html")
+                    incomplete_completed_fees = Student.objects.filter(balance__gt=0)
+                    completed_fees = Student.objects.filter(balance__lte=0)
+                    all_students = Student.objects.all()
+                    return render(request, "staff index.html",
+                                  {"incomplete_completed_fees": incomplete_completed_fees,
+                                   "completed_fees": completed_fees,
+                                   "all_students": all_students})
                 elif request.POST.get("student"):
                     return render(request, "index.html", {"current_time": default_now()})
                 else:
@@ -61,7 +67,6 @@ def admin_index(request):
     user = request.user
     if user.is_authenticated:
         if user.is_superuser:
-
             return render(request, "admin index.html")
         messages.error(request, "This section is reserved for admins.")
 

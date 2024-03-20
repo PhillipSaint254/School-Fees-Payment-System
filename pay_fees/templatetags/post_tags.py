@@ -8,6 +8,6 @@ def count_characters(value):
     return len(value)
 
 
-@register.filter(name='progress_bar')
+@register.simple_tag
 def progress_bar(balance, full):
     return round((balance/full) * 100, 2)
