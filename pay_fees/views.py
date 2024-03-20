@@ -566,6 +566,7 @@ class PayProcessView(CreateAPIView):
             transaction.response_code = result_code
             transaction.transaction_time = actual_datetime
             transaction.msisdn = phone_number
+            transaction.complete = True
             transaction.save()
 
             messages.success(request,
