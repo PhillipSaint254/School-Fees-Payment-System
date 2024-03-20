@@ -793,30 +793,32 @@ def initiate_stk_push(request, id):  # Replaces confirm pay
                                 }
 
                                 try:
-                                    response = requests.post(process_request_url, headers=stk_push_headers, json=stk_push_payload)
-                                    response.raise_for_status()
-                                    # Raise exception for non-2xx status codes
-                                    response_data = response.json()
-                                    checkout_request_id = response_data['CheckoutRequestID']
-                                    response_code = response_data['ResponseCode']
-                                    merchant_request_id = response.get("MerchantRequestID", None)
-                                    response_description = response.get("ResponseDescription", None)
-                                    customer_message = response.get("CustomerMessage", None)
+                                    for _ in range(5):
+                                        response = requests.post(process_request_url, headers=stk_push_headers, json=stk_push_payload)
+                                        response.raise_for_status()
+                                        # Raise exception for non-2xx status codes
+                                        response_data = response.json()
+                                        checkout_request_id = response_data['CheckoutRequestID']
+                                        response_code = response_data['ResponseCode']
 
-                                    if response_code == "0":
-                                        transaction.response_code = response_code
-                                        transaction.checkout_request_id = checkout_request_id
-                                        transaction.merchant_request_id = merchant_request_id
-                                        transaction.customer_message = customer_message
-                                        transaction.response_description = response_description
-                                        transaction.save()
-                                        return render(request, "complete pay.html", {"transaction": transaction})
-                                    else:
-                                        messages.warning(request, "STK push incomplete. Confirm transaction details and try again")
-                                        schools = School.objects.all()
-                                        redirect_url = reverse(
-                                            'pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
-                                        return redirect(redirect_url)
+                                        if response_code == "0" or response_code == 0:
+                                            merchant_request_id = response.get("MerchantRequestID", None)
+                                            response_description = response.get("ResponseDescription", None)
+                                            customer_message = response.get("CustomerMessage", None)
+
+                                            transaction.response_code = response_code
+                                            transaction.checkout_request_id = checkout_request_id
+                                            transaction.merchant_request_id = merchant_request_id
+                                            transaction.customer_message = customer_message
+                                            transaction.response_description = response_description
+                                            transaction.save()
+                                            return render(request, "complete pay.html", {"transaction": transaction})
+
+                                    messages.warning(request, "STK push incomplete. Confirm transaction details and try again")
+                                    schools = School.objects.all()
+                                    redirect_url = reverse(
+                                        'pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+                                    return redirect(redirect_url)
                                 except requests.exceptions.RequestException as e:
                                     return JsonResponse({'error': str(e)})
                             else:
