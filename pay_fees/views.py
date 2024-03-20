@@ -545,33 +545,46 @@ class PayProcessView(CreateAPIView):
         try:
             body = data["Body"]
             stkCallback = body["stkCallback"]
+            result_code = stkCallback["ResultCode"]
+
             merchant_request_id = stkCallback["MerchantRequestID"]
             checkout_request_id = stkCallback["CheckoutRequestID"]  # Corrected typo
-            result_code = stkCallback["ResultCode"]
             result_description = stkCallback["ResultDesc"]
-            callback_metadata = stkCallback["CallbackMetadata"]["Item"]
-            amount = next(item for item in callback_metadata if item["Name"] == "Amount")["Value"]
-            mpesa_receipt_number = next(item for item in callback_metadata if item["Name"] == "MpesaReceiptNumber")[
-                "Value"]
-            transaction_date = next(item for item in callback_metadata if item["Name"] == "TransactionDate")["Value"]
-            phone_number = next(item for item in callback_metadata if item["Name"] == "PhoneNumber")["Value"]
 
-            str_datetime = str(transaction_date)
-            actual_datetime = datetime.strptime(str_datetime, "%Y%m%d%H%M%S")
+            if result_code == "0" or result_code == 0:
+                callback_metadata = stkCallback["CallbackMetadata"]["Item"]
+                amount = next(item for item in callback_metadata if item["Name"] == "Amount")["Value"]
+                mpesa_receipt_number = next(item for item in callback_metadata if item["Name"] == "MpesaReceiptNumber")[
+                    "Value"]
+                transaction_date = next(item for item in callback_metadata if item["Name"] == "TransactionDate")["Value"]
+                phone_number = next(item for item in callback_metadata if item["Name"] == "PhoneNumber")["Value"]
 
-            transaction.merchant_request_id = merchant_request_id
-            transaction.checkout_request_id = checkout_request_id
-            transaction.transaction_amount = amount
-            transaction.response_description = result_description
-            transaction.response_code = result_code
-            transaction.transaction_time = actual_datetime
-            transaction.msisdn = phone_number
-            transaction.complete = True
-            transaction.save()
+                str_datetime = str(transaction_date)
+                actual_datetime = datetime.strptime(str_datetime, "%Y%m%d%H%M%S")
 
-            messages.success(request,
-                             f"You have successfully paid {amount} to {transaction.student.faculty.school.name} at {actual_datetime}.")
-            return render(request, "index.html", {"current_date": default_now()})
+                transaction.merchant_request_id = merchant_request_id
+                transaction.checkout_request_id = checkout_request_id
+                transaction.transaction_amount = amount
+                transaction.response_description = result_description
+                transaction.response_code = result_code
+                transaction.transaction_time = actual_datetime
+                transaction.msisdn = phone_number
+                transaction.complete = True
+                transaction.save()
+
+                student = transaction.student
+
+                student.balance -= amount
+                student.save()
+
+                messages.success(request,
+                                 f"You have successfully paid {amount} to {student.faculty.school.name} at {actual_datetime}.")
+                return render(request, "index.html", {"current_date": default_now()})
+
+            messages.warning(request, result_description)
+            schools = School.objects.all()  # Ensure you have defined School somewhere or adjust accordingly
+            redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+            return redirect(redirect_url)
 
         except KeyError as e:
             return JsonResponse({'error': f'Missing data for: {str(e)}'}, status=400)
