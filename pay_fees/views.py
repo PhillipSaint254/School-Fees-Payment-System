@@ -61,6 +61,7 @@ def admin_index(request):
     user = request.user
     if user.is_authenticated:
         if user.is_superuser:
+
             return render(request, "admin index.html")
         messages.error(request, "This section is reserved for admins.")
 

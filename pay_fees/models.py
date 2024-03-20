@@ -149,6 +149,7 @@ class Student(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     student_name = models.CharField(max_length=25, null=True)
     balance = models.IntegerField(default=45670)
+    full_fees = models.IntegerField(default=45670)
 
     def __str__(self):
         return self.student_name

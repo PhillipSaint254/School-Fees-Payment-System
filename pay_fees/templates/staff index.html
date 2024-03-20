@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load post_tags %}
 
 {% block title %}Registration page{% endblock %}
 
@@ -7,197 +8,169 @@
 {% endblock %}
 
 {% block body %}
-<style>
-    body {
-        background-color: #f8f9fa; /* Light gray background */
-    }
 
-    .full {
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .full-75 {
-        min-height: 75vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .sign-up-container {
-        max-width: 90vw;
-        padding: 20px;
-        border: 1px solid #ced4da;
-        border-radius: 5px;
-        background-color: #ffffff;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .sign-up-container form {
-        margin-top: 15px;
-    }
-
-    .sign-up-container label {
-        font-weight: bold;
-    }
-
-    .email-input .sign-up-container input, .password-input .sign-up-container input {
-        padding: 10px;
-        margin-bottom: 15px;
-        border: 1px solid #ced4da;
-        border-radius: 4px;
-        box-sizing: border-box;
-    }
-
-    .sign-up-container .form-check {
-        margin-bottom: 15px;
-    }
-
-    .submit-button {
-        width: 100%;
-        padding: 10px;
-        border: none;
-        border-radius: 4px;
-        background-color: #007bff;
-        color: #ffffff;
-        cursor: pointer;
-    }
-
-    .submit-button:hover {
-        background-color: #0056b3;
-    }
-</style>
-
-<div class="container-fluid full-75">
-    <div class="row py-5">
-        <div class="sign-up-container col-10 col-sm-9 col-lg-8 mx-auto justify-content-center bg-white rounded w-100">
-            {% if messages %}
-                <ul>
-                {% for message in messages %}
-                    <li class="text-danger">{{ message }}</li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-            <div>
-                <h2 class="text-center">Registration Form</h2>
-                <form action="" method="post">
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="col-12 col-md-8 col-lg-6 mb-3">
-                            <label for="first-name" class="form-label">First Name</label>
-                            <input type="text" class="form-control" id="first-name" name="first-name" aria-describedby="first-name-help">
-                            <div id="first-name-help" class="form-text">As per your national ID/Birth certificate.</div>
+<div class="container full">
+    <div class="accordion accordion-flush" id="accordionFlushExample">
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="flush-headingOne">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+            List of students with fee balance
+          </button>
+        </h2>
+        <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+          <div class="accordion-body">
+            <div class="table-wrapper">
+              <table class="table custom-table table-striped" id="incompleteFeesTable">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Middle Name</th>
+                    <th scope="col">Last Name</th>
+                    <th scope="col">Balance</th>
+                    <th scope="col">Progress</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Repeat this TR for each project -->
+                  {% if incomplete_completed_fees %}
+                  {% for student in incomplete_completed_fees %}
+                  <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ student.first_name }}</td>
+                    <td>{{ student.middle_name }}</td>
+                    <td>{{ student.last_name }}</td>
+                    <td>{{ student.balance }}</td>
+                    <td>
+                        {% progress_bar student.balance student.full_fees as progress %}
+                        <div class="progress" style="height: 5px; border-radius: 5px;">
+                          <div class="progress-bar" role="progressbar" style="width: {{ progress }}%;" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">{{ progress }}%</div>
                         </div>
-                        <div class="col-12 col-md-8 col-lg-6 mb-3">
-                            <label for="last-name" class="form-label">Last Name</label>
-                            <input type="text" class="form-control" id="last-name" name="last-name" aria-describedby="last-name-help">
-                            <div id="last-name-help" class="form-text">As per your national ID/Birth certificate.</div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-md-8 col-lg-6 mb-3">
-                            <label for="registration-number" class="form-label">Registration Number</label>
-                            <input type="tel" class="form-control" id="registration-number" name="registration-number" aria-describedby="registration-number-help">
-                            <div id="registration-number-help" class="form-text">Enter your registration number.</div>
-                        </div>
-                        <div class="col-12 col-md-8 col-lg-6 mb-3">
-                            <label for="last-name" class="form-label">Phone Number</label>
-                            <input type="tel" class="form-control" id="phone-number" name="phone-number" aria-describedby="phone-number-help">
-                            <div id="phone-number-help" class="form-text">Enter your Safaricom line phone number.</div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 mb-3">
-                            <label for="exampleInputEmail1" class="form-label">Email Address</label>
-                            <input type="email" class="form-control" id="exampleInputEmail1" name="email" aria-describedby="emailHelp">
-                            <div id="emailHelp" class="form-text">Enter your email.</div>
-                        </div>
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="exampleCheck2" onchange="registerStudent()">
-                        <label class="form-check-label" for="exampleCheck2">I am a student</label>
-                    </div>
-                    <div id="school-choice" style="display: none;">
-                        <div class="row">
-                            <div class="col-12">
-                                <h3 class="text-center">Select School</h3>
-                            </div>
-                        </div>
-                        {% if schools %}
-                        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4">
-                          {% for school in schools %}
-                            <div class="col">
-                              <div class="info-box">
-                                <div class="card-body">
-                                  <h5 class="card-title">
-                                      {{ school.name }}
-                                    <a href="/adm/add_products/">
-                                        <i class="fas fa-plus"></i> Add <!-- Changed to vertical ellipsis -->
-                                    </a>
-                                  </h5>
-                                  <p class="card-text">{{ school.school_head }}</p>
-                                  <small>{{ school.student_numbers }} students</small>
-                                </div>
-                              </div>
-                            </div>
-                          {% endfor %}
-                        </div>
-                        {% else %}
-                            <p class="text-center text-danger py-3">No schools registered</p>
-                        {% endif %}
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-md-8 col-lg-6 mb-3">
-                            <label for="exampleInputPassword1" class="form-label">Set Password</label>
-                            <input type="password" class="form-control" name="password1" id="exampleInputPassword1">
-                        </div>
-                        <div class="col-12 col-md-8 col-lg-6 mb-3">
-                            <label for="exampleInputPassword2" class="form-label">Confirm Password</label>
-                            <input type="password" class="form-control" name="password2" id="exampleInputPassword2">
-                        </div>
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="exampleCheck1" onchange="passwordViewRegister()">
-                        <label class="form-check-label" for="exampleCheck1">See Password</label>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-12 col-md-8 mb-3 mx-auto d-flex justify-content-center">
-                            <button type="submit" class="btn btn-primary text-center mx-auto submit-button">sign up</button>
-                        </div>
-                    </div>
-                </form>
+                    </td>
+                  </tr>
+                  <!-- End of TR for each project -->
+                  {% endfor %}
+                  {% else %}
+                  <tr>
+                    <td colspan="5">No student has incomplete fee balance.</td>
+                  </tr>
+                  {% endif %}
+                </tbody>
+              </table>
             </div>
+          </div>
         </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="flush-headingTwo">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+            List of students with no fee balance
+          </button>
+        </h2>
+        <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample">
+          <div class="accordion-body">
+            <div class="table-wrapper">
+              <table class="table custom-table table-striped" id="completeFeesTable">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Middle Name</th>
+                    <th scope="col">Last Name</th>
+                    <th scope="col">Balance</th>
+                    <th scope="col">Progress</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Repeat this TR for each project -->
+                  {% if completed_fees %}
+                  {% for student in completed_fees %}
+                  <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ student.first_name }}</td>
+                    <td>{{ student.middle_name }}</td>
+                    <td>{{ student.last_name }}</td>
+                    <td>{{ student.balance }}</td>
+                    <td>
+                        {% progress_bar student.balance student.full_fees as progress %}
+                        <div class="progress" style="height: 5px; border-radius: 5px;">
+                          <div class="progress-bar" role="progressbar" style="width: {{ progress }}%;" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">{{ progress }}%</div>
+                        </div>
+                    </td>
+                  </tr>
+                  <!-- End of TR for each project -->
+                  {% endfor %}
+                  {% else %}
+                  <tr>
+                    <td colspan="5">No student has completed fees.</td>
+                  </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="flush-headingThree">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
+            List of all students
+          </button>
+        </h2>
+        <div id="flush-collapseThree" class="accordion-collapse collapse" aria-labelledby="flush-headingThree" data-bs-parent="#accordionFlushExample">
+          <div class="accordion-body">
+            <div class="table-wrapper">
+              <table class="table custom-table table-striped" id="allStudentsTable">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Middle Name</th>
+                    <th scope="col">Last Name</th>
+                    <th scope="col">Balance</th>
+                    <th scope="col">Progress</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Repeat this TR for each project -->
+                  {% if all_students %}
+                  {% for student in all_students %}
+                  <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ student.first_name }}</td>
+                    <td>{{ student.middle_name }}</td>
+                    <td>{{ student.last_name }}</td>
+                    <td>{{ student.balance }}</td>
+                    <td>
+                      {% progress_bar student.balance student.full_fees as progress %}
+                      <div class="progress" style="height: 5px; border-radius: 5px;">
+                        <div class="progress-bar" role="progressbar" style="width: {{ progress }}%;" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">{{ progress }}%</div>
+                      </div>
+                    </td>
+                  </tr>
+                  <!-- End of TR for each project -->
+                  {% endfor %}
+                  {% else %}
+                  <tr>
+                    <td colspan="5">No student in the database.</td>
+                  </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 </div>
 
-
 <script>
-    function passwordViewRegister() {
-        var password1 = document.getElementById("exampleInputPassword1");
-        var password2 = document.getElementById("exampleInputPassword2");
-        var checkbox = document.getElementById("exampleCheck1");
-
-        if (checkbox.checked) {
-            password1.type = "text";
-            password2.type = "text";
-        } else {
-            password1.type = "password";
-            password2.type = "password";
-        }
-    }
-
-    function registerStudent() {
-        var schoolChoice = document.getElementById('school-choice');
-        if (schoolChoice.style.display === 'none') {
-            schoolChoice.style.display = 'block';
-        } else {
-            schoolChoice.style.display = 'none'; // Show the message
-        }
-      });
+  new DataTable("#completeFeesTable");
+  new DataTable("#incompleteFeesTable");
+  new DataTable("#allStudentsTable");
 </script>
 
 {% endblock %}
