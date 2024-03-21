@@ -13,7 +13,8 @@ from django.views.decorators.http import require_GET
 from django_daraja.mpesa.core import MpesaClient
 from rest_framework.permissions import AllowAny
 from datetime import datetime
-from pay_fees.models import default_now, School, Faculty, Course, Student, User, PaymentMethods, Transaction, Parent
+from pay_fees.models import default_now, School, Faculty, Course, Student, User, PaymentMethods, Transaction, Parent, \
+    Staff
 from rest_framework.generics import CreateAPIView
 from pay_fees.serializers import TransactionSerializer
 
@@ -37,7 +38,13 @@ def index(request):
                 if request.POST.get("admin"):
                     return render(request, "admin index.html")
                 elif request.POST.get("staff"):
-                    return render(request, "staff index.html")
+                    incomplete_completed_fees = Student.objects.filter(balance__gt=0)
+                    completed_fees = Student.objects.filter(balance__lte=0)
+                    all_students = Student.objects.all()
+                    return render(request, "staff index.html",
+                                  {"incomplete_completed_fees": incomplete_completed_fees,
+                                   "completed_fees": completed_fees,
+                                   "all_students": all_students})
                 elif request.POST.get("student"):
                     return render(request, "index.html", {"current_time": default_now()})
                 else:
@@ -238,7 +245,9 @@ def user_registration(request):
                 raise
             except Exception as error:
                 messages.error(request, error)
-                raise
+                schools = School.objects.all()
+                redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+                return redirect(redirect_url)
 
         else:
             messages.error(request, "Password mismatch.")
@@ -313,9 +322,102 @@ def add_school(request):
 def add_staff(request):
     user = request.user
     if user.is_authenticated:
-        if user.is_superuser:
+        if user.is_superuser or user.is_staff:
             if request.method == "POST":
-                pass
+                first_name = request.POST["first-name"].lower().strip()
+                last_name = request.POST["last-name"].strip().lower()
+                middle_name = request.POST["middle-name"].strip().lower()
+                email = request.POST["email"].strip().lower()
+                password1 = request.POST["password1"]
+                password2 = request.POST["password2"]
+                phone = request.POST["phone-number"].strip()
+                id_number = request.POST["id-number"].strip()
+
+                school_input = request.POST["school-input"]
+
+                try:
+                    User.objects.get(email=email)
+                    messages.error(request, f"User with the email '{email}' already exists.")
+                    return redirect("pay_fees:register")
+                except:
+                    pass
+
+                try:
+                    school = School.objects.get(id=school_input.split(":")[0])
+                except:
+                    messages.error(request, "Please choose a valid school option.")
+                    return redirect("pay_fees:register")
+
+                if password1 == password2:
+
+                    try:
+                        user_id = 1
+                        last_user = User.objects.all().order_by("-id")
+                        if last_user:
+                            user_id = last_user[0].id + 1
+
+                            while True:
+                                try:
+                                    User.objects.get(user_id)
+                                    user_id += 1
+                                except:
+                                    break
+
+                        user = User.objects.create(
+                            id=user_id,
+                            email=email,
+                            first_name=first_name,
+                            last_name=last_name,
+                            phone=phone,
+                        )
+
+                        if middle_name:
+                            user.middle_name = middle_name
+
+                        if id_number:
+                            user.id_number = id_number
+
+                        user.set_password(password1)
+
+                        user.save()
+
+                        staff_id = 1
+                        last_staff = Staff.objects.all().order_by("-id")
+                        if last_user:
+                            staff_id = last_staff[0].id + 1
+
+                            while True:
+                                try:
+                                    Staff.objects.get(user_id)
+                                    staff_id += 1
+                                except:
+                                    break
+
+                        staff = Staff.objects.create(
+                            id=staff_id,
+                            staff_name=user.get_full_name()
+                        )
+
+                        staff.school = school
+
+                        if user.is_superuser:
+                            staff.approved = True
+
+                        staff.save()
+
+                        messages.success(request, "Staff registration successful.")
+                        return render(request, "index.html", {"current_time": default_now()})
+
+                    except IntegrityError:
+                        messages.error(request, "Email or registration number already registered.")
+                        raise
+                    except Exception as error:
+                        messages.error(request, error)
+                        schools = School.objects.all()
+                        redirect_url = reverse(
+                            'pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+                        return redirect(redirect_url)
+
             return render(request, "add staff.html")
         messages.error(request, "This section is reserved for admins.")
 
@@ -337,7 +439,7 @@ def user_logout(request):
 
 
 def all_school(request):
-    schools = School.objects.all().order_by("name")
+    schools = School.objects.all()
     school_names = [f"{school.id}: {school.school_code} - {school.name.capitalize()}" for school in schools]
     return JsonResponse({"schools": school_names})
 

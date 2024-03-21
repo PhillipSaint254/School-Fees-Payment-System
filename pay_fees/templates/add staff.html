@@ -1,7 +1,220 @@
 {% extends "base.html" %}
 
 {% block body %}
+<style>
+    body {
+        background-color: #f8f9fa; /* Light gray background */
+    }
 
+    .full {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
+    .full-75 {
+        min-height: 75vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
+    .sign-up-container {
+        max-width: 90vw;
+        padding: 20px;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        background-color: #ffffff;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .sign-up-container form {
+        margin-top: 15px;
+    }
+
+    .sign-up-container label {
+        font-weight: bold;
+    }
+
+    .email-input .sign-up-container input, .password-input .sign-up-container input {
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    .sign-up-container .form-check {
+        margin-bottom: 15px;
+    }
+
+    .submit-button {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        background-color: #007bff;
+        color: #ffffff;
+        cursor: pointer;
+    }
+
+    .submit-button:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<style>
+    /* Custom select styles */
+    .custom-select {
+        position: relative;
+        width: 100%;
+    }
+
+    .select-selected {
+        background-color: #f8f9fa;
+        padding: 10px 15px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .select-selected:after {
+        position: absolute;
+        content: "";
+        top: 18px;
+        right: 10px;
+        width: 0;
+        height: 0;
+        border: 6px solid transparent;
+        border-color: #000 transparent transparent transparent;
+    }
+
+    .select-items div {
+        padding: 10px 15px;
+        cursor: pointer;
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+        border-top: none;
+        border-radius: 0 0 4px 4px;
+    }
+
+    .select-items div:hover {
+        background-color: #dee2e6;
+    }
+
+    .select-hide {
+        display: none;
+    }
+
+    .select-options {
+        max-width: 200px;
+        word-wrap: break-word;
+    }
+</style>
+
+<div class="container-fluid full-75">
+    <div class="row py-5">
+        <div class="sign-up-container col-10 col-sm-9 col-lg-8 mx-auto justify-content-center bg-white rounded w-100">
+            {% if messages %}
+                <ul>
+                {% for message in messages %}
+                    <li class="text-danger">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+            <div>
+                <h2 class="text-center">Staff Registration Form</h2>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-12 col-md-8 col-lg-4 mb-3">
+                            <label for="first-name" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="first-name" name="first-name" aria-describedby="first-name-help" required>
+                            <div id="first-name-help" class="form-text">As per your national ID/Birth certificate.</div>
+                        </div>
+                        <div class="col-12 col-md-8 col-lg-4 mb-3">
+                            <label for="middle-name" class="form-label">Middle Name</label>
+                            <input type="text" class="form-control" id="middle-name" name="middle-name" aria-describedby="middle-name-help">
+                            <div id="middle-name-help" class="form-text">Optional field.</div>
+                        </div>
+                        <div class="col-12 col-md-8 col-lg-4 mb-3">
+                            <label for="last-name" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="last-name" name="last-name" aria-describedby="last-name-help" required>
+                            <div id="last-name-help" class="form-text">As per your national ID/Birth certificate.</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-8 col-lg-4 mb-3">
+                            <label for="id-number" class="form-label">ID Number</label>
+                            <input type="tel" class="form-control" id="id-number" name="id-number" aria-describedby="id-number-help" required>
+                            <div id="id-number-help" class="form-text">Optional field.</div>
+                        </div>
+                        <div class="col-12 col-md-8 col-lg-4 mb-3">
+                            <label for="last-name" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone-number" name="phone-number" aria-describedby="phone-number-help" required>
+                            <div id="phone-number-help" class="form-text">Enter your Safaricom line phone number.</div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-md-8 col-lg-6 mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="exampleInputEmail1" name="email" aria-describedby="emailHelp" required>
+                            <div id="emailHelp" class="form-text">Enter your email.</div>
+                        </div>
+                        <div class="col-12 col-md-8 col-lg-6 mb-3" id="school-choice">
+                            <label for="school_input" class="form-label">Institution</label>
+                            <input type="text" class="form-control" id="school_input" name="school-input" oninput="filterSchools(this.value)" aria-describedby="school-help" placeholder="Type your institution name">
+                            <div id="school-help" class="form-text">At which institution do you work?</div>
+                            <div id="school-options" class="select-options select-hide"></div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-md-8 col-lg-6 mb-3">
+                            <label for="exampleInputPassword1" class="form-label">Set Password</label>
+                            <input type="password" class="form-control" name="password1" id="exampleInputPassword1" required>
+                        </div>
+                        <div class="col-12 col-md-8 col-lg-6 mb-3">
+                            <label for="exampleInputPassword2" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" name="password2" id="exampleInputPassword2" required>
+                        </div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="exampleCheck1" onchange="passwordViewRegister()">
+                        <label class="form-check-label" for="exampleCheck1">See Password</label>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-md-8 mb-3 mx-auto">
+                            <button type="submit" class="btn btn-primary text-center mx-auto submit-button text-center">register as staff</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // When the page loads, fetch schools and then perform actions
+    window.onload = function () {
+        fetchSchools()
+            .then(schools => {
+                // Once schools are fetched, store them and perform other actions
+                var schoolInput = document.getElementById("school_input");
+                schoolInput.setAttribute('data-schools', JSON.stringify(schools));
+            })
+            .catch(error => {
+                console.error('Error fetching schools:', error);
+            });
+
+            facultyInput.value = ""; // Reset faculty input
+            courseInput.disabled = true; // Disable course input
+            courseInput.value = "";
+            password1Input.value = "";
+            document.getElementById("faculty-options").innerHTML = ""; // Clear previous
+    };
+</script>
 {% endblock %}

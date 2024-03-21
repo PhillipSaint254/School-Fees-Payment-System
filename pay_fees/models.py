@@ -227,12 +227,22 @@ class Parent(models.Model):
         return self.parent_name
 
 
-# class Comment(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-#     username = models.CharField(max_length=50, default="Anonymous")
-#     comment = models.TextField()
-#     time_stamp = models.DateTimeField(default=default_now)
-#     state = models.CharField(max_length=15, default="Accepted")
-#
-#     def __str__(self):
-#         return f"{self.user.first_name} {self.user.last_name}" if self.user else self.username
+class Staff(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="Staff")
+    school = models.ForeignKey(School, on_delete=models.CASCADE, null=True, related_name="WorkPlace")
+    staff_name = models.CharField(max_length=50, null=True)
+    approved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.staff_name
+
+
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    username = models.CharField(max_length=50, default="Anonymous")
+    comment = models.TextField()
+    time_stamp = models.DateTimeField(default=default_now)
+    state = models.CharField(max_length=15, default="Accepted")
+
+    def __str__(self):
+        return f"{self.user.first_name} {self.user.last_name}" if self.user else self.username
