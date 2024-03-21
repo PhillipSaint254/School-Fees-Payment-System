@@ -176,24 +176,6 @@ def update_student_numbers(sender, instance, created, **kwargs):
 
 
 class Transaction(models.Model):
-    # "TransactionType": "Pay Bill",
-    # "TransID": "RKTQDM7W6S",
-    # "TransTime": "20191122063845",
-    # "TransAmount": "10"
-    # "BusinessShortCode": "600638",
-    # "BillRefNumber": "invoice008",
-    # "InvoiceNumber": "",
-    # "OrgAccountBalance": ""
-    # "ThirdPartyTransID": "",
-    # "MSISDN": "25470****149",
-    # "FirstName": "John",
-    # "MiddleName": ""
-    # "LastName": "Doe"
-
-    # {"MerchantRequestID": "53e3-4aa8-9fe0-8fb5e4092cdd240016",
-    #  "CheckoutRequestID": "ws_CO_01022024073918981742332937", "ResponseCode": "0",
-    #  "ResponseDescription": "Success. Request accepted for processing",
-    #  "CustomerMessage": "Success. Request accepted for processing"}
     student = models.ForeignKey(Student, on_delete=models.DO_NOTHING, null=True)
     transaction_code = models.CharField(max_length=50, unique=True, default=code_generate)
     transaction_type = models.CharField(max_length=10, null=True)
@@ -211,6 +193,7 @@ class Transaction(models.Model):
     complete = models.BooleanField(default=False)
     time_stamp = models.DateTimeField(default=default_now, null=True)
     payment_method = models.CharField(max_length=20, default="m-pesa")
+    status = models.CharField(max_length=10, default="incomplete")
     # Preprocessing data
     merchant_request_id = models.CharField(max_length=100, null=True)
     checkout_request_id = models.CharField(max_length=100, null=True)

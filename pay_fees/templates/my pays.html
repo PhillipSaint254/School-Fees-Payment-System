@@ -55,9 +55,9 @@
               <td>{{ transaction.time_stamp.date }}</td>
               <td>
                 {% if transaction.complete %}
-                <span class="badge pill-success rounded-pill">Complete</span>
+                <span class="badge pill-success rounded-pill">{{ transaction.status }}</span>
                 {% else %}
-                <span class="badge pill-failure rounded-pill">Incomplete</span>
+                <span class="badge pill-failure rounded-pill">{{ transaction.status }}</span>
                 {% endif %}
               </td>
               <td>

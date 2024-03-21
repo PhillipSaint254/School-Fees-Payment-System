@@ -130,8 +130,6 @@
         max-height: 1000px; /* Adjust max-height to accommodate your content */
         transition: max-height 0.5s ease-in;
     }
-
-
 </style>
 
 <div class="container-fluid full-75">
@@ -318,7 +316,7 @@
         fetchSchools()
             .then(schools => {
                 // Once schools are fetched, store them and perform other actions
-                var schoolInput = document.getElementById("school-input");
+                var schoolInput = document.getElementById("school_input");
                 schoolInput.setAttribute('data-schools', JSON.stringify(schools));
             })
             .catch(error => {
@@ -337,7 +335,7 @@
         var schoolOptions = document.getElementById("school-options");
         schoolOptions.innerHTML = ""; // Clear previous options
 
-        var schools = JSON.parse(document.getElementById("school-input").getAttribute('data-schools'));
+        var schools = JSON.parse(document.getElementById("school_input").getAttribute('data-schools'));
 
         if (input.trim() === "") {
             schoolOptions.classList.add("select-hide");
@@ -366,7 +364,7 @@
 
     // Function to handle the selection of a school
     function selectSchool(school) {
-        var schoolInput = document.getElementById("school-input");
+        var schoolInput = document.getElementById("school_input");
         schoolInput.value = school;
         selectedSchoolPK = school.split(":")[0];
         document.getElementById("school-options").classList.add("select-hide");
@@ -374,7 +372,7 @@
 
     // Event listener to close the dropdown when clicked outside
     document.addEventListener("click", function(e) {
-        if (!e.target.matches('#school-input')) {
+        if (!e.target.matches('#school_input')) {
             document.getElementById("school-options").classList.add("select-hide");
             fetchFaculties()
                 .then(faculties => {

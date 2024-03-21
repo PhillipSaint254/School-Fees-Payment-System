@@ -765,7 +765,9 @@ def confirm_pay(request, id):
                             redirect_url = reverse(
                                 'pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
                             return redirect(redirect_url)
-                    messages.success(request, "You have successfully cancelled this transaction.")
+                    transaction.status = "cancelled"
+                    transaction.save()
+                    messages.success(request, "Transaction cancelled.")
                     schools = School.objects.all()
                     redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
                     return redirect(redirect_url)
