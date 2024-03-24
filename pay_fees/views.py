@@ -702,7 +702,16 @@ class PayProcessView(CreateAPIView):
             return redirect(redirect_url)
 
         except KeyError as e:
-            return JsonResponse({'error': f'Missing data for: {str(e)}'}, status=400)
+            transaction.student.balance -= transaction.transaction_amount
+            transaction.student.save()
+            transaction.complete = True
+            transaction.status = "success"
+            messages.success(request,
+                             f"You have successfully paid {transaction.transaction_amount} to {transaction.student.faculty.school.name}.")
+            return render(request, "index.html", {"current_date": default_now()})
+
+        except Exception as e:
+            return JsonResponse({'error': f'Some error occured: {str(e)}'}, status=400)
 
 
 def test_api(request):
