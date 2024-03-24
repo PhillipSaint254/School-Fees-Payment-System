@@ -587,7 +587,6 @@ def process_pay(request, id):
                             json_data = request.json()
                             extract_data = json.loads(json_data)
 
-                            # request_body = request.body
                             print()
                             print()
                             print("### RESPONSE DATA ###")
@@ -650,6 +649,14 @@ class PayProcessView(CreateAPIView):
             return redirect(redirect_url)
 
         data = request.data
+        print()
+        print()
+        print("###############DATA##############")
+        print(data)
+        print("#################################")
+        print()
+        print()
+
         try:
             body = data["Body"]
             stkCallback = body["stkCallback"]
