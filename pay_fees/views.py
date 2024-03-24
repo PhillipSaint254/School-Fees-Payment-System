@@ -809,17 +809,24 @@ def confirm_pay(request, id):
                 if request.method == "POST":
                     if "yes" in request.POST:
                         try:
-                            cl = MpesaClient()
-                            phone_number = transaction.msisdn
-                            amount = int(transaction.transaction_amount)
-                            account_reference = 'Schoolfees'
-                            transaction_desc = f'School fees payment for {user.get_full_name().title()}'
-                            callback_url = f'https://paymyfees.onrender.com/process_pay/{transaction.id}/'
-                            response_json = cl.stk_push(phone_number, amount, account_reference, transaction_desc, callback_url)
+                            response = None
+                            response_code = -1
 
-                            # Parse the JSON response
-                            response = response_json.json()
-                            response_code = response.get('ResponseCode', None)
+                            for _ in range(5):
+                                cl = MpesaClient()
+                                phone_number = transaction.msisdn
+                                amount = int(transaction.transaction_amount)
+                                account_reference = 'Schoolfees'
+                                transaction_desc = 'Fees pay'
+                                callback_url = f'https://paymyfees.onrender.com/process_pay/{transaction.id}/'
+                                response_json = cl.stk_push(phone_number, amount, account_reference, transaction_desc, callback_url)
+
+                                # Parse the JSON response
+                                response = response_json.json()
+                                response_code = response.get('ResponseCode', None)
+
+                                if response_code == "0" or response_code == 0:
+                                    break
 
                             print()
                             print()
