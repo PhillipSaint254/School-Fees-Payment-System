@@ -2,6 +2,21 @@
 
 {% block title %}My Transactions{% endblock %}
 
+{% block warning %}
+{% if is_parent %}
+<div class="container px-5 py-2">
+    <div class="row">
+      <div class="alert alert-warning d-flex align-items-center" role="alert">
+        <i class="fas fa-exclamation-triangle mr-2"></i>
+        <div>
+          You are paying fees for {{ student }}.
+        </div>
+      </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
 {% block body %}
 
 <style>
@@ -13,7 +28,7 @@
   }
 </style>
 
-<div class="container full-75 p-5">
+<div class="container full-75 {% if is_parent %}pt-3 pb-5{% else %}p-5{% endif %}">
     <div class="row">
       <div class="table-wrapper">
         <table class="table align-middle mb-0 bg-white my-4">

@@ -4,6 +4,21 @@
 
 {% endblock %}
 
+{% block warning %}
+{% if is_parent %}
+<div class="container">
+    <div class="row py-2">
+      <div class="alert alert-warning d-flex align-items-center" role="alert">
+        <i class="fas fa-exclamation-triangle mr-2"></i>
+        <div>
+          You are paying fees for {{ student }}.
+        </div>
+      </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
 {% block body %}
 
 <style>
@@ -72,7 +87,7 @@
 </style>
 
 <div class="container-fluid full-75">
-    <div class="row py-5">
+    <div class="row {% if is_parent %}pt-3 pb-5{% else %}py-5{% endif %}">
         <div class="login-container d-flex mx-auto justify-content-center align-items-center">
             <div>
                 <h2 class="text-center">Payment Details</h2>

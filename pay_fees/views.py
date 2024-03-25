@@ -476,11 +476,13 @@ def pay_fees(request):
     if user.is_authenticated:
         try:
             student = Student.objects.get(user=user)
+            is_parent = False
         except Student.DoesNotExist:
 
             try:
                 _user = Parent.objects.get(user=user).student
                 student = Student.objects.get(user=_user)
+                is_parent = True
 
             except Parent.DoesNotExist:
                 messages.error(request, "Please select who you want to pay fees for")
@@ -507,7 +509,10 @@ def pay_fees(request):
 
         transaction = Transaction(id=transaction_id, student=student)
         transaction.save()
-        return render(request, "payment method.html", {"payment_options": payment_options, "transaction": transaction})
+        return render(request, "payment method.html", {"payment_options": payment_options,
+                                                       "transaction": transaction,
+                                                       "is_parent": is_parent,
+                                                       "student": student.user.get_full_name().title()})
     messages.error(request, "Access reserved to authenticated users!")
     return redirect("pay_fees:login")
 
@@ -517,9 +522,13 @@ def handle_selected_payment_method(request, id):
     if user.is_authenticated:
         transaction = Transaction.objects.get(id=id)
 
-        if transaction.student.user != user:
+        student = transaction.student
+        is_parent = False
+        if student.user != user:
             try:
-                Parent.objects.get(user=user).student
+                _user = Parent.objects.get(user=user).student
+                student = Student.object.get(user=_user)
+                is_parent = True
             except Parent.DoesNotExist:
                 messages.error(request, "You are not authorized to make this transaction!")
                 schools = School.objects.all()
@@ -531,7 +540,9 @@ def handle_selected_payment_method(request, id):
                 payment_method = request.POST.get("paymentMethod", "")
                 transaction.payment_method = payment_method if payment_method else "m-pesa"
                 transaction.save()
-                return render(request, "payment details.html", {"transaction": transaction})
+                return render(request, "payment details.html", {"transaction": transaction,
+                                                                "is_parent": is_parent,
+                                                                "student": student.user.get_full_name().title()})
             messages.error(request, "No payment method selected")
             schools = School.objects.all()
             redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
@@ -549,9 +560,13 @@ def payment_details(request, id):
     user = request.user
     if user.is_authenticated:
         transaction = Transaction.objects.get(id=id)
-        if transaction.student.user != user:
+        student = transaction.student
+        is_parent = False
+        if student.user != user:
             try:
-                Parent.objects.get(user=user).student
+                _user = Parent.objects.get(user=user).student
+                student = Student.objects.get(user=_user)
+                is_parent = True
             except Parent.DoesNotExist:
                 messages.error(request, "You are not authorized to make this transaction!")
                 schools = School.objects.all()
@@ -565,7 +580,9 @@ def payment_details(request, id):
                 transaction.transaction_amount = amount if amount else transaction.student.balance
                 transaction.msisdn = phone
                 transaction.save()
-                return render(request, "confirm pay.html", {"transaction": transaction})
+                return render(request, "confirm pay.html", {"transaction": transaction,
+                                                            "is_parent": is_parent,
+                                                            "student": student.user.get_full_name().title()})
             messages.error(request, "Form not submitted")
             schools = School.objects.all()
             redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
@@ -636,9 +653,13 @@ class PayProcessView(CreateAPIView):
         except Transaction.DoesNotExist:
             return JsonResponse({'error': 'Transaction not found.'}, status=404)
 
-        if transaction.student.user != user:
+        student = transaction.student
+        is_parent = False
+        if student.user != user:
             try:
-                Parent.objects.get(user=user).student
+                _user = Parent.objects.get(user=user).student
+                student = Student.objects.get(user=_user)
+                is_parent = True
             except Parent.DoesNotExist:
                 messages.error(request, "You are not authorized to make this transaction!")
                 schools = School.objects.all()
@@ -698,7 +719,9 @@ class PayProcessView(CreateAPIView):
 
                 messages.success(request,
                                  f"You have successfully paid {amount} to {student.faculty.school.name} at {actual_datetime}.")
-                return render(request, "index.html", {"current_date": default_now()})
+                return render(request, "index.html", {"current_date": default_now(),
+                                                      "is_parent": is_parent,
+                                                      "student": student.user.get_full_name().title()})
 
             messages.warning(request, result_description)
             schools = School.objects.all()  # Ensure you have defined School somewhere or adjust accordingly
@@ -748,17 +771,21 @@ def my_transactions(request):
     if user.is_authenticated:
         try:
             student = Student.objects.get(user=user)
+            is_parent = False
         except Student.DoesNotExist:
             try:
                 _user = Parent.objects.get(user=user).student
                 student = Student.objects.get(user=_user)
+                is_parent = True
             except Parent.DoesNotExist:
                 messages.error(request, "Only students and parents are authorised to view transactions.")
                 schools = School.objects.all()
                 redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
                 return redirect(redirect_url)
         _my_transactions = Transaction.objects.filter(student=student).order_by("-time_stamp")
-        return render(request, "my pays.html", {"my_transactions": _my_transactions})
+        return render(request, "my pays.html", {"my_transactions": _my_transactions,
+                                                "is_parent": is_parent,
+                                                "student": student.user.get_full_name().title()})
     messages.error(request, "Access reserved to authenticated users!")
     return redirect("pay_fees:login")
 
@@ -767,9 +794,14 @@ def recover_transaction(request, id):
     user = request.user
     if user.is_authenticated:
         transaction = Transaction.objects.get(id=id)
+
+        student = transaction.student
+        is_parent = False
         if transaction.student.user != user:
             try:
-                Parent.objects.get(user=user).student
+                _user = Parent.objects.get(user=user).student
+                student = Student.objects.get(user=_user)
+                is_parent = True
             except Parent.DoesNotExist:
                 messages.error(request, "Only students and parents are authorised to view transactions.")
                 schools = School.objects.all()
@@ -777,14 +809,22 @@ def recover_transaction(request, id):
                 return redirect(redirect_url)
 
         if not transaction.payment_method:
-            return render(request, "payment method.html", {"transaction": transaction})
+            return render(request, "payment method.html", {"transaction": transaction,
+                                                           "is_parent": is_parent,
+                                                            "student": student.user.get_full_name().title()})
         if not transaction.transaction_amount or not transaction.msisdn:
-            return render(request, "payment details.html", {"transaction": transaction})
+            return render(request, "payment details.html", {"transaction": transaction,
+                                                            "is_parent": is_parent,
+                                                            "student": student.user.get_full_name().title()})
         if not (transaction.merchant_request_id or transaction.checkout_request_id or
                 transaction.response_description or transaction.customer_message):
-            return render(request, "confirm pay.html", {"transaction": transaction})
+            return render(request, "confirm pay.html", {"transaction": transaction,
+                                                        "is_parent": is_parent,
+                                                        "student": student.user.get_full_name().title()})
         if not (transaction.merchant_request_id or transaction.response_description):
-            return render(request, "confirm pay.html", {"transaction": transaction})
+            return render(request, "confirm pay.html", {"transaction": transaction,
+                                                        "is_parent": is_parent,
+                                                        "student": student.user.get_full_name().title()})
 
         messages.error(request, "Transaction recovery failed.")
         schools = School.objects.all()
@@ -849,9 +889,14 @@ def confirm_pay(request, id):
     user = request.user
     if user.is_authenticated:
         transaction = Transaction.objects.get(id=id)
-        if transaction.student.user != user:
+
+        student = transaction.student
+        is_parent = False
+        if student.user != user:
             try:
-                Parent.objects.get(user=user).student
+                _user = Parent.objects.get(user=user).student
+                student = Student.objects.get(user=_user)
+                is_parent -= True
             except Parent.DoesNotExist:
                 messages.error(request, "You are not authorized to make this transaction!")
                 schools = School.objects.all()
@@ -911,7 +956,9 @@ def confirm_pay(request, id):
                                 transaction.customer_message = customer_message
                                 transaction.response_description = response_description
                                 transaction.save()
-                                return render(request, "complete pay.html", {"transaction": transaction})
+                                return render(request, "complete pay.html", {"transaction": transaction,
+                                                                             "is_parent": is_parent,
+                                                                             "student": student.user.get_full_name().title()})
 
                             messages.error(request, "Invalid response code.")
                             schools = School.objects.all()
