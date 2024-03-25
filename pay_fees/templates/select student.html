@@ -24,6 +24,10 @@
         align-items: center;
     }
 
+    .select-hide {
+        display: none;
+    }
+
     .login-container {
         width: 100%;
         max-width: 98vw;
@@ -151,7 +155,6 @@
                 option.textContent = student;
                 option.addEventListener("click", function() {
                     selectStudent(student);
-                    studentOptions.classList.add("select-hide");
                 });
                 studentOptions.appendChild(option);
             });
@@ -161,12 +164,7 @@
     }
 
     function selectStudent(student) {
-        // Assuming you just want to show the student name in the input
-        // Split the string and update the input with the student name part
         studentInput.value = student;
-
-        // You may want to store the student ID in a hidden input for form submission
-        // Example: document.getElementById("hiddenStudentIdInput").value = student.split(": ")[0];
         document.getElementById("student-options").classList.add("select-hide");
     }
 
