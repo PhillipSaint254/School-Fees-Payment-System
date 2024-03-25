@@ -782,14 +782,13 @@ def my_student(request):
             _user = User.objects.get(get_full_name=student_name)
 
             if _user.registration_number == student_reg:
-                return JsonResponse({"success": "successful"})
-                # Parent.objects.create(
-                #     user=user,
-                #     student=_user.student,
-                #     parent_name=user.get_full_name()
-                # ).save()
-                # messages.success(request, f"You have registered as {_user.get_full_name()}'s parent.")
-                # return render(request, "index.html", {"current_date": default_now()})
+                Parent.objects.create(
+                    user=user,
+                    student=_user.student,
+                    parent_name=user.get_full_name()
+                ).save()
+                messages.success(request, f"You have registered as {_user.get_full_name()}'s parent.")
+                return render(request, "index.html", {"current_date": default_now()})
             messages.success(request,
                              f"The student name you entered does not match the registration number you specified.")
         return render(request, "select student.html")
