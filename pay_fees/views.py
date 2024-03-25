@@ -133,7 +133,7 @@ def user_registration(request):
             try:
                 User.objects.get(email=email)
                 messages.error(request, f"User with the email '{email}' already exists.")
-                return redirect("pay_fees:register")
+                return redirect("pay_fees:index")
             except:
                 pass
 
