@@ -24,10 +24,6 @@
         align-items: center;
     }
 
-    .select-hide {
-        display: none;
-    }
-
     .login-container {
         width: 100%;
         max-width: 98vw;
@@ -83,7 +79,7 @@
                     {% csrf_token %}
                     <div class="mb-3 email-input">
                         <label for="studentName" class="form-label">Student Name</label>
-                        <input type="text" class="form-control" id="studentName" onchange="filterStudents(this.value)" name="student-name" aria-describedby="studentNameHelp">
+                        <input type="text" class="form-control" id="studentName" onchange="filterSelectionStudents(this.value)" name="student-name" aria-describedby="studentNameHelp">
                         <div id="studentNameHelp" class="form-text">Type the name of your student.</div>
                         <div id="student-options" class="select-options select-hide"></div>
                     </div>
@@ -121,7 +117,7 @@
                     var studentNameInput = document.getElementById("studentName");
                     if (studentNameInput) {
                         studentNameInput.addEventListener('keyup', function() {
-                            filterStudents(this.value);
+                            filterSelectionStudents(this.value);
                         });
                     }
                 }
@@ -131,7 +127,7 @@
             });
     };
 
-    function filterStudents(input) {
+    function filterSelectionStudents(input) {
         var studentOptions = document.getElementById("student-options");
         studentOptions.innerHTML = "";
         var students = JSON.parse(studentInput.getAttribute('data-students'));
@@ -154,7 +150,7 @@
                 // Show the full student string "{id}: {name}" in the option
                 option.textContent = student;
                 option.addEventListener("click", function() {
-                    selectStudent(student);
+                    selectionStudent(student);
                 });
                 studentOptions.appendChild(option);
             });
@@ -163,8 +159,9 @@
         }
     }
 
-    function selectStudent(student) {
+    function selectionStudent(student) {
         studentInput.value = student;
+        document.getElementById("student-options").innerHTML = "";
         document.getElementById("student-options").classList.add("select-hide");
     }
 
