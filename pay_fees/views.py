@@ -66,7 +66,7 @@ def index(request):
                     messages.error(request, "Invalid choice, please select again.")
             return render(request, "staff login prompt.html")
         schools = School.objects.all()
-        return render(request, "dashboard.html", {"current_time": default_now(), "schools": schools})
+        return render(request, "index.html", {"current_time": default_now(), "schools": schools})
     return render(request, "index.html", {"current_time": default_now()})
 
 
