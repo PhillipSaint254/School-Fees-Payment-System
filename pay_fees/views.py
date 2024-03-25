@@ -757,7 +757,7 @@ def my_student(request):
     if user.is_authenticated:
         if request.method == "POST":
             try:
-                student_id = request.POST["student-name"].split(": ")[0].strip().lower()
+                student_id = request.POST["student-name"].split(": ")[0].strip()
                 student_reg = request.POST["student-reg"].strip().upper()
 
                 _student = Student.objects.get(id=student_id)
@@ -773,7 +773,7 @@ def my_student(request):
                 if _student.user.registration_number == student_reg:
                     Parent.objects.create(
                         user=user,
-                        student=_student,
+                        student=_student.user,
                         parent_name=user.get_full_name()
                     ).save()
                     messages.success(request, f"You have registered as {_student.user.get_short_name()}'s parent.")
