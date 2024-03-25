@@ -777,7 +777,7 @@ def my_student(request):
     if user.is_authenticated:
         if request.method == "POST":
             student_id = request.POST["student-name"].split(": ")[0].strip().lower()
-            student_reg = request.POST["student-reg"].strip()
+            student_reg = request.POST["student-reg"].strip().upper()
 
             _user = User.objects.get(id=student_id)
 
