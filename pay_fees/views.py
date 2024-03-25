@@ -114,7 +114,7 @@ def user_registration(request):
         email = request.POST["email"].strip().lower()
         password1 = request.POST["password1"]
         password2 = request.POST["password2"]
-        reg_number = request.POST["registration-number"].upper().strip() if request.POST["registration-number"] else ""
+        reg_number = request.POST["registration-number"].upper().strip() if request.POST["registration-number"] else None
         phone = request.POST["phone-number"].strip()
         id_number = request.POST["id-number"].strip()
 
@@ -201,11 +201,7 @@ def user_registration(request):
                 if user is not None:
                     login(request, user)
 
-                if request.POST.get("register-parent"):
-                    """Parent registration"""
-                    return render(request, "select student.html")
-
-                elif request.POST.get("register-student"):
+                if request.POST.get("register-student") or reg_number:
                     """Student registration"""
                     check_reg()
                     course = check_student_details()
@@ -234,8 +230,9 @@ def user_registration(request):
                     messages.success(request, "Registration successful.")
 
                     return render(request, "index.html", {"current_time": default_now()})
-                messages.error(request, "Course selection error.")
-                return redirect("pay_fees:register")
+                else:
+                    """Parent registration"""
+                    return render(request, "select student.html")
 
             except IntegrityError:
                 messages.error(request, "Email or registration number already registered.")
