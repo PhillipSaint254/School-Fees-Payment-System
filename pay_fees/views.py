@@ -549,27 +549,32 @@ def payment_details(request, id):
     user = request.user
     if user.is_authenticated:
         transaction = Transaction.objects.get(id=id)
-        if transaction.student.user == user:
-            if not transaction.complete:
-                if request.method == "POST":
-                    amount = request.POST["amount"]
-                    phone = request.POST["phone-number"]
-                    transaction.transaction_amount = amount if amount else transaction.student.balance
-                    transaction.msisdn = phone
-                    transaction.save()
-                    return render(request, "confirm pay.html", {"transaction": transaction})
-                messages.error(request, "Form not submitted")
+        if transaction.student.user != user:
+            try:
+                Parent.objects.get(user=user).student
+            except Parent.DoesNotExist:
+                messages.error(request, "You are not authorized to make this transaction!")
                 schools = School.objects.all()
                 redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
                 return redirect(redirect_url)
-            messages.error(request, "Transaction already effected.")
+
+        if not transaction.complete:
+            if request.method == "POST":
+                amount = request.POST["amount"]
+                phone = request.POST["phone-number"]
+                transaction.transaction_amount = amount if amount else transaction.student.balance
+                transaction.msisdn = phone
+                transaction.save()
+                return render(request, "confirm pay.html", {"transaction": transaction})
+            messages.error(request, "Form not submitted")
             schools = School.objects.all()
             redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
             return redirect(redirect_url)
-        messages.error(request, "You are not authorized to make this transaction!")
+        messages.error(request, "Transaction already effected.")
         schools = School.objects.all()
         redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
         return redirect(redirect_url)
+
     messages.error(request, "Access reserved to authenticated users!")
     return redirect("pay_fees:login")
 
@@ -611,10 +616,6 @@ def process_pay(request, id):
             schools = School.objects.all()
             redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
             return redirect(redirect_url)
-        messages.error(request, "You are not authorized to make this transaction!")
-        schools = School.objects.all()
-        redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
-        return redirect(redirect_url)
     messages.error(request, "Access reserved to authenticated users!")
     return redirect("pay_fees:login")
 
@@ -636,10 +637,13 @@ class PayProcessView(CreateAPIView):
             return JsonResponse({'error': 'Transaction not found.'}, status=404)
 
         if transaction.student.user != user:
-            messages.error(request, "You are not authorized to make this transaction!")
-            schools = School.objects.all()  # Ensure you have defined School somewhere or adjust accordingly
-            redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
-            return redirect(redirect_url)
+            try:
+                Parent.objects.get(user=user).student
+            except Parent.DoesNotExist:
+                messages.error(request, "You are not authorized to make this transaction!")
+                schools = School.objects.all()
+                redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+                return redirect(redirect_url)
 
         if transaction.complete:
             messages.error(request, "Transaction already effected.")
@@ -823,101 +827,106 @@ def confirm_pay(request, id):
     user = request.user
     if user.is_authenticated:
         transaction = Transaction.objects.get(id=id)
-        if transaction.student.user == user:
-            if not transaction.complete:
-                if request.method == "POST":
-                    if "yes" in request.POST:
-                        try:
-                            response = None
-                            response_code = -1
-
-                            for _ in range(5):
-                                cl = MpesaClient()
-                                phone_number = transaction.msisdn
-                                amount = int(transaction.transaction_amount)
-                                account_reference = 'Schoolfees'
-                                transaction_desc = 'Fees pay'
-                                callback_url = f'https://paymyfees.onrender.com/process_pay/{transaction.id}/'
-                                response_json = cl.stk_push(phone_number, amount, account_reference, transaction_desc, callback_url)
-
-                                # Parse the JSON response
-                                response = response_json.json()
-                                response_code = response.get('ResponseCode', None)
-
-                                if response_code == "0" or response_code == 0:
-                                    break
-
-                            print()
-                            print()
-                            print()
-                            print("### RESPONSE ###")
-                            print("*************************************************")
-                            print(response)
-                            print(response_code)
-                            print("*************************************************")
-                            print()
-                            print()
-                            print()
-
-                            if response_code:
-                                merchant_request_id = response.get("MerchantRequestID", None)
-                                checkout_request_id = response.get("CheckoutRequestID", None)
-                                response_description = response.get("ResponseDescription", None)
-                                customer_message = response.get("CustomerMessage", None)
-                                print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-                                print(f"response_code: {response_code}, merchant_id: {merchant_request_id}, checkout_response_id: "
-                                      f"{checkout_request_id}, response_description: {response_description}, "
-                                      f"customer_message: {customer_message}")
-                                print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-                                # return HttpResponse(response_json)
-                                if int(response_code) == 0:
-                                    transaction.response_code = response_code
-                                    transaction.checkout_request_id = checkout_request_id
-                                    transaction.merchant_request_id = merchant_request_id
-                                    transaction.customer_message = customer_message
-                                    transaction.response_description = response_description
-                                    transaction.save()
-                                    return render(request, "complete pay.html", {"transaction": transaction})
-
-                                messages.error(request, "Invalid response code.")
-                                schools = School.objects.all()
-                                redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
-                                return redirect(redirect_url)
-
-                            else:
-                                transaction.merchant_request_id = response.get("requestId", None)
-                                transaction.response_description = response.get("errorMessage", None)
-                                transaction.save()
-
-                                messages.error(request, f'Some error occurred: {transaction.response_description}')
-
-                                schools = School.objects.all()
-                                redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
-                                return redirect(redirect_url)
-                        except Exception as error:
-                            messages.error(request, error)
-                            schools = School.objects.all()
-                            redirect_url = reverse(
-                                'pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
-                            return redirect(redirect_url)
-                    transaction.status = "cancelled"
-                    transaction.save()
-                    messages.success(request, "Transaction cancelled.")
-                    schools = School.objects.all()
-                    redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
-                    return redirect(redirect_url)
-                messages.error(request, "Form not submitted")
+        if transaction.student.user != user:
+            try:
+                Parent.objects.get(user=user).student
+            except Parent.DoesNotExist:
+                messages.error(request, "You are not authorized to make this transaction!")
                 schools = School.objects.all()
                 redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
                 return redirect(redirect_url)
-            messages.error(request, "Transaction already effected.")
+
+        if not transaction.complete:
+            if request.method == "POST":
+                if "yes" in request.POST:
+                    try:
+                        response = None
+                        response_code = -1
+
+                        for _ in range(5):
+                            cl = MpesaClient()
+                            phone_number = transaction.msisdn
+                            amount = int(transaction.transaction_amount)
+                            account_reference = 'Schoolfees'
+                            transaction_desc = 'Fees pay'
+                            callback_url = f'https://paymyfees.onrender.com/process_pay/{transaction.id}/'
+                            response_json = cl.stk_push(phone_number, amount, account_reference, transaction_desc, callback_url)
+
+                            # Parse the JSON response
+                            response = response_json.json()
+                            response_code = response.get('ResponseCode', None)
+
+                            if response_code == "0" or response_code == 0:
+                                break
+
+                        print()
+                        print()
+                        print()
+                        print("### RESPONSE ###")
+                        print("*************************************************")
+                        print(response)
+                        print(response_code)
+                        print("*************************************************")
+                        print()
+                        print()
+                        print()
+
+                        if response_code:
+                            merchant_request_id = response.get("MerchantRequestID", None)
+                            checkout_request_id = response.get("CheckoutRequestID", None)
+                            response_description = response.get("ResponseDescription", None)
+                            customer_message = response.get("CustomerMessage", None)
+                            print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+                            print(f"response_code: {response_code}, merchant_id: {merchant_request_id}, checkout_response_id: "
+                                  f"{checkout_request_id}, response_description: {response_description}, "
+                                  f"customer_message: {customer_message}")
+                            print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+                            # return HttpResponse(response_json)
+                            if int(response_code) == 0:
+                                transaction.response_code = response_code
+                                transaction.checkout_request_id = checkout_request_id
+                                transaction.merchant_request_id = merchant_request_id
+                                transaction.customer_message = customer_message
+                                transaction.response_description = response_description
+                                transaction.save()
+                                return render(request, "complete pay.html", {"transaction": transaction})
+
+                            messages.error(request, "Invalid response code.")
+                            schools = School.objects.all()
+                            redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+                            return redirect(redirect_url)
+
+                        else:
+                            transaction.merchant_request_id = response.get("requestId", None)
+                            transaction.response_description = response.get("errorMessage", None)
+                            transaction.save()
+
+                            messages.error(request, f'Some error occurred: {transaction.response_description}')
+
+                            schools = School.objects.all()
+                            redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+                            return redirect(redirect_url)
+                    except Exception as error:
+                        messages.error(request, error)
+                        schools = School.objects.all()
+                        redirect_url = reverse(
+                            'pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+                        return redirect(redirect_url)
+                transaction.status = "cancelled"
+                transaction.save()
+                messages.success(request, "Transaction cancelled.")
+                schools = School.objects.all()
+                redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+                return redirect(redirect_url)
+            messages.error(request, "Form not submitted")
             schools = School.objects.all()
             redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
             return redirect(redirect_url)
-        messages.error(request, "You are not authorized to make this transaction!")
+        messages.error(request, "Transaction already effected.")
         schools = School.objects.all()
         redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
         return redirect(redirect_url)
+
     messages.error(request, "Access reserved to authenticated users!")
     return redirect("pay_fees:login")
 
