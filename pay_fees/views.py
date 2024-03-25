@@ -776,21 +776,24 @@ def my_student(request):
     user = request.user
     if user.is_authenticated:
         if request.method == "POST":
-            student_id = request.POST["student-name"].split(": ")[0].strip().lower()
-            student_reg = request.POST["student-reg"].strip().upper()
+            try:
+                student_id = request.POST["student-name"].split(": ")[0].strip().lower()
+                student_reg = request.POST["student-reg"].strip().upper()
 
-            _user = User.objects.get(id=student_id)
+                _user = User.objects.get(id=student_id)
 
-            if _user.registration_number == student_reg:
-                Parent.objects.create(
-                    user=user,
-                    student=_user.student,
-                    parent_name=user.get_full_name()
-                ).save()
-                messages.success(request, f"You have registered as {_user.get_short_name()}'s parent.")
-                return render(request, "index.html", {"current_date": default_now()})
-            messages.success(request,
-                             f"The student name you entered does not match the registration number you specified.")
+                if _user.registration_number == student_reg:
+                    Parent.objects.create(
+                        user=user,
+                        student=_user.student,
+                        parent_name=user.get_full_name()
+                    ).save()
+                    messages.success(request, f"You have registered as {_user.get_short_name()}'s parent.")
+                    return render(request, "index.html", {"current_date": default_now()})
+                messages.error(request,
+                                 f"The student name you entered does not match the registration number you specified.")
+            except User.DoesNotExist:
+                messages.success(request, f"Please select a name from the suggestion box.")
         return render(request, "select student.html")
     messages.error(request, "Access reserved to authenticated users!")
     return redirect("pay_fees:login")
