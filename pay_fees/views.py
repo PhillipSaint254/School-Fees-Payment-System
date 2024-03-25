@@ -760,23 +760,23 @@ def my_student(request):
                 student_id = request.POST["student-name"].split(": ")[0].strip().lower()
                 student_reg = request.POST["student-reg"].strip().upper()
 
-                _user = User.objects.get(id=student_id)
+                _student = Student.objects.get(id=student_id)
 
                 print()
                 print()
                 print("#############Selected User#############")
-                print(_user)
-                print(_user.get_full_name())
+                print(_student)
+                print(_student.user.get_full_name())
                 print()
                 print()
 
-                if _user.registration_number == student_reg:
+                if _student.user.registration_number == student_reg:
                     Parent.objects.create(
                         user=user,
-                        student=_user.student,
+                        student=_student,
                         parent_name=user.get_full_name()
                     ).save()
-                    messages.success(request, f"You have registered as {_user.get_short_name()}'s parent.")
+                    messages.success(request, f"You have registered as {_student.user.get_short_name()}'s parent.")
                     return render(request, "index.html", {"current_date": default_now()})
                 messages.error(request,
                                  f"The student name you entered does not match the registration number you specified.")
