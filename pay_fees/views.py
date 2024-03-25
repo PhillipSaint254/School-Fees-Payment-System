@@ -198,11 +198,11 @@ def user_registration(request):
 
                 user.save()
 
+                if user is not None:
+                    login(request, user)
+
                 if "register-parent" in request.POST:
                     """Parent registration"""
-                    if user is not None:
-                        login(request, user)
-
                     return render(request, "select student.html")
 
                 elif "register-student" in request.POST:
@@ -231,9 +231,6 @@ def user_registration(request):
                         )
                         student.save()
 
-                    if user is not None:
-                        login(request, user)
-
                     messages.success(request, "Registration successful.")
 
                     return render(request, "index.html", {"current_time": default_now()})
@@ -244,6 +241,7 @@ def user_registration(request):
             except IntegrityError:
                 messages.error(request, "Email or registration number already registered.")
                 raise
+
             except Exception as error:
                 messages.error(request, error)
                 schools = School.objects.all()

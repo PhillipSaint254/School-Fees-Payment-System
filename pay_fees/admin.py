@@ -4,7 +4,7 @@ from .models import *
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    search_fields = ("first_name", "middle_name", "last_name", "email", "phone")
+    search_fields = ("first_name", "middle_name", "last_name", "email", "phone", 'registration_number')
 
 
 @admin.register(School)
