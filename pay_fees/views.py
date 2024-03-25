@@ -704,13 +704,13 @@ class PayProcessView(CreateAPIView):
             redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
             return redirect(redirect_url)
 
-        except KeyError as e:
+        except KeyError:
             transaction.student.balance -= transaction.transaction_amount
             transaction.student.save()
             transaction.complete = True
             transaction.status = "success"
             messages.success(request,
-                             f"You have successfully paid {transaction.transaction_amount} to {transaction.student.faculty.school.name}.")
+                             f"You have successfully paid {transaction.transaction_amount} to {transaction.student.course.faculty.school.name}.")
             return render(request, "index.html", {"current_date": default_now()})
 
         except Exception as e:
