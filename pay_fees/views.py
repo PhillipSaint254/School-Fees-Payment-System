@@ -129,13 +129,12 @@ def user_registration(request):
                 messages.error(request, "All fields required!")
                 return redirect("pay_fees:register")
 
-        def check_email():
-            try:
-                User.objects.get(email=email)
-                messages.error(request, f"User with the email '{email}' already exists.")
-                return redirect("pay_fees:register")
-            except:
-                pass
+        try:
+            User.objects.get(email=email)
+            messages.error(request, f"User with the email '{email}' already exists.")
+            return redirect("pay_fees:register")
+        except:
+            pass
 
         def check_student_details():
             try:
@@ -163,8 +162,6 @@ def user_registration(request):
             except:
                 messages.error(request, "Please choose a valid course option.")
                 return redirect("pay_fees:register")
-
-        check_email()
 
         if password1 == password2:
 
