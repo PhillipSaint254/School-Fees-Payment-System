@@ -709,8 +709,11 @@ class PayProcessView(CreateAPIView):
             transaction.student.save()
             transaction.complete = True
             transaction.status = "success"
-            messages.success(request,
-                             f"You have successfully paid {transaction.transaction_amount} to {transaction.student.course.faculty.school.name}.")
+            if transaction.student == user:
+                message = f"You have successfully paid {transaction.transaction_amount} to {transaction.student.course.faculty.school.name} as school fees."
+            else:
+                message = f"You have successfully paid {transaction.transaction_amount} to {transaction.student.course.faculty.school.name} for {transaction.student.user.get_full_name().title()}'s account."
+            messages.success(request,message)
             return render(request, "index.html", {"current_date": default_now()})
 
         except Exception as e:
@@ -740,10 +743,14 @@ def my_transactions(request):
         try:
             student = Student.objects.get(user=user)
         except Student.DoesNotExist:
-            messages.error(request, "Only students are allowed to view transactions")
-            schools = School.objects.all()
-            redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
-            return redirect(redirect_url)
+            try:
+                _user = Parent.objects.get(user=user).student
+                student = Student.objects.get(user=_user)
+            except Parent.DoesNotExist:
+                messages.error(request, "Only students and parents are authorised to view transactions.")
+                schools = School.objects.all()
+                redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+                return redirect(redirect_url)
         _my_transactions = Transaction.objects.filter(student=student).order_by("-time_stamp")
         return render(request, "my pays.html", {"my_transactions": _my_transactions, "account": student.course.faculty.school.name})
     messages.error(request, "Access reserved to authenticated users!")
@@ -796,7 +803,7 @@ def my_student(request):
                         student=_student.user,
                         parent_name=user.get_full_name()
                     ).save()
-                    messages.success(request, f"You have registered as {_student.user.get_short_name()}'s parent.")
+                    messages.success(request, f"You have registered as {_student.user.get_short_name().title()}'s parent.")
                     return render(request, "index.html", {"current_date": default_now()})
                 messages.error(request,
                                  f"The student name you entered does not match the registration number you specified.")
