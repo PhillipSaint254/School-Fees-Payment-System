@@ -786,6 +786,10 @@ def recover_transaction(request, id):
         if not (transaction.merchant_request_id or transaction.response_description):
             return render(request, "confirm pay.html", {"transaction": transaction})
 
+        messages.error(request, "Transaction recovery failed.")
+        schools = School.objects.all()
+        redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+        return redirect(redirect_url)
     messages.error(request, "Access reserved to authenticated users!")
     return redirect("pay_fees:login")
 
