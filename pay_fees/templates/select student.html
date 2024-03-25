@@ -79,7 +79,7 @@
                     {% csrf_token %}
                     <div class="mb-3 email-input">
                         <label for="studentName" class="form-label">Student Name</label>
-                        <input type="text" class="form-control" id="studentName" name="student-name" aria-describedby="studentNameHelp">
+                        <input type="text" class="form-control" id="studentName" onchange="filterStudents(this.value)" name="student-name" aria-describedby="studentNameHelp">
                         <div id="studentNameHelp" class="form-text">Type the name of your student.</div>
                         <div id="student-options" class="select-options select-hide"></div>
                     </div>
@@ -96,35 +96,24 @@
 </div>
 
 <script>
-    // Correction for the script tag
-    var studentInput = document.getElementById("studentName"); // Corrected the ID to match the HTML
+    var studentInput = document.getElementById("studentName");
 
     function fetchStudents() {
         return fetch('/get_all_students/')
             .then(response => response.json())
             .then(data => {
-                return data.students; // Assuming this returns an array of student names or objects
+                return data.students; // Returns an array of student names in the "{id}: {name}" format
             })
             .catch(error => {
                 console.error('Error:', error);
             });
     }
 
-    // When the page loads, fetch students
     window.onload = function() {
         fetchStudents()
             .then(students => {
-                // Assuming `studentInput` is defined globally or within this context correctly
-                if (studentInput) { // Check if studentInput is not null
+                if (studentInput) {
                     studentInput.setAttribute('data-students', JSON.stringify(students));
-                    // Assuming you need to add the event listener for filtering students
-                    // Ensure this element exists and is correctly identified
-                    var studentNameInput = document.getElementById("studentName");
-                    if (studentNameInput) {
-                        studentNameInput.addEventListener('keyup', function() {
-                            filterStudents(this.value);
-                        });
-                    }
                 }
             })
             .catch(error => {
@@ -132,11 +121,9 @@
             });
     };
 
-    // Function to filter students based on user input
     function filterStudents(input) {
         var studentOptions = document.getElementById("student-options");
-        studentOptions.innerHTML = ""; // Clear previous options
-
+        studentOptions.innerHTML = "";
         var students = JSON.parse(studentInput.getAttribute('data-students'));
 
         if (input.trim() === "") {
@@ -145,16 +132,19 @@
         }
 
         var matchingStudents = students.filter(function(student) {
-            return student.toLowerCase().includes(input.toLowerCase()); // Assuming student is a string. If student is an object, adjust accordingly
+            // Split the student string to extract the name part for comparison
+            var studentName = student.split(": ")[1];
+            return studentName.toLowerCase().includes(input.toLowerCase());
         });
 
         if (matchingStudents.length > 0) {
             studentOptions.classList.remove("select-hide");
             matchingStudents.forEach(function(student) {
                 var option = document.createElement("div");
-                option.textContent = student; // Adjust if student is an object
+                // Show the full student string "{id}: {name}" in the option
+                option.textContent = student;
                 option.addEventListener("click", function() {
-                    selectStudent(this.textContent);
+                    selectStudent(student);
                 });
                 studentOptions.appendChild(option);
             });
@@ -163,11 +153,13 @@
         }
     }
 
-    // Function to handle the selection of a student
     function selectStudent(student) {
-        var studentInput = document.getElementById("studentName");
-        studentInput.value = student; // Adjust if student is an object
-        // Assuming you need to do something with the student's primary key or other identifier here
+        // Assuming you just want to show the student name in the input
+        // Split the string and update the input with the student name part
+        var studentName = student.split(": ")[1];
+        studentInput.value = studentName;
+        // You may want to store the student ID in a hidden input for form submission
+        // Example: document.getElementById("hiddenStudentIdInput").value = student.split(": ")[0];
         document.getElementById("student-options").classList.add("select-hide");
     }
 
