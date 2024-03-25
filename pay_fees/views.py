@@ -124,18 +124,10 @@ def user_registration(request):
 
         print(f"{email} {password1} {password2} {reg_number} {phone} {course_input}")
 
-        def check_reg():
+        def check_inputs():
             if not (reg_number and course_input and email and first_name and password1):
                 messages.error(request, "All fields required!")
                 return redirect("pay_fees:register")
-
-        # def check_email():
-        #     try:
-        #         User.objects.get(email=email)
-        #         messages.error(request, f"User with the email '{email}' already exists.")
-        #         return redirect("pay_fees:index")
-        #     except:
-        #         pass
 
         def check_student_details():
             try:
@@ -149,13 +141,6 @@ def user_registration(request):
             except:
                 messages.error(request, "Please choose a valid faculty option.")
                 return redirect("pay_fees:register")
-
-            try:
-                User.objects.get(registration_number=reg_number)
-                messages.error(request, f"User with the registration number '{email}' already exists.")
-                return redirect("pay_fees:register")
-            except:
-                pass
 
             try:
                 course_id = course_input.split(":")[0]
@@ -205,9 +190,9 @@ def user_registration(request):
                     """Parent registration"""
                     return render(request, "select student.html")
 
-                else:
+                elif request.POST.get("register-student"):
                     """Student registration"""
-                    check_reg()
+                    check_inputs()
                     course = check_student_details()
                     if course:
                         student_id = 1
@@ -231,10 +216,10 @@ def user_registration(request):
                         )
                         student.save()
 
-                    messages.success(request, "Registration successful.")
+                        messages.success(request, "Registration successful.")
+                        return render(request, "index.html", {"current_time": default_now()})
 
-                    return render(request, "index.html", {"current_time": default_now()})
-                messages.error(request, "Course selection error.")
+                    messages.error(request, "Course selection error.")
                 return redirect("pay_fees:register")
 
             except IntegrityError:
