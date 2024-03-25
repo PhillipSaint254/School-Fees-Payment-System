@@ -527,7 +527,7 @@ def handle_selected_payment_method(request, id):
         if student.user != user:
             try:
                 _user = Parent.objects.get(user=user).student
-                student = Student.object.get(user=_user)
+                student = Student.objects.get(user=_user)
                 is_parent = True
             except Parent.DoesNotExist:
                 messages.error(request, "You are not authorized to make this transaction!")

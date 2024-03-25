@@ -1,5 +1,20 @@
 {% extends "base.html" %}
 
+{% block warning %}
+{% if is_parent %}
+<div class="container px-5 py-2">
+    <div class="row">
+      <div class="alert alert-warning d-flex align-items-center" role="alert">
+        <i class="fas fa-exclamation-triangle mr-2"></i>
+        <div>
+          You are paying fees for {{ student }}.
+        </div>
+      </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
 {% block body %}
 
 <style>
