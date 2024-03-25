@@ -762,6 +762,14 @@ def my_student(request):
 
                 _user = User.objects.get(id=student_id)
 
+                print()
+                print()
+                print("#############Selected User#############")
+                print(_user)
+                print(_user.get_full_name())
+                print()
+                print()
+
                 if _user.registration_number == student_reg:
                     Parent.objects.create(
                         user=user,
