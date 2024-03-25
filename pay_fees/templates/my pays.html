@@ -24,6 +24,7 @@
               <th>Amount</th>
               <th>Date</th>
               <th>Status</th>
+              <th>Fee Balance</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -57,6 +58,7 @@
                 <span class="badge pill-failure rounded-pill">{{ transaction.status }}</span>
                 {% endif %}
               </td>
+              <td>{{ transaction.fee_balance }}</td>
               <td>
                 {% if not transaction.complete %}
                 <a href="/recover_transaction/{{ transaction.id }}/" type="button" class="btn btn-outline-primary btn-sm btn-rounded">

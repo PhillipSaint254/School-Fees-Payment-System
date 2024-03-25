@@ -680,6 +680,11 @@ class PayProcessView(CreateAPIView):
                 str_datetime = str(transaction_date)
                 actual_datetime = datetime.strptime(str_datetime, "%Y%m%d%H%M%S")
 
+                student = transaction.student
+
+                student.balance -= amount
+                student.save()
+
                 transaction.merchant_request_id = merchant_request_id
                 transaction.checkout_request_id = checkout_request_id
                 transaction.transaction_amount = amount
@@ -688,12 +693,8 @@ class PayProcessView(CreateAPIView):
                 transaction.transaction_time = actual_datetime
                 transaction.msisdn = phone_number
                 transaction.complete = True
+                transaction.fee_balance = student.balance
                 transaction.save()
-
-                student = transaction.student
-
-                student.balance -= amount
-                student.save()
 
                 messages.success(request,
                                  f"You have successfully paid {amount} to {student.faculty.school.name} at {actual_datetime}.")
@@ -705,16 +706,19 @@ class PayProcessView(CreateAPIView):
             return redirect(redirect_url)
 
         except KeyError:
-            transaction.student.balance -= transaction.transaction_amount
-            transaction.student.save()
+            student = transaction.student
+            student.balance -= transaction.transaction_amount
+            student.save()
+
             transaction.complete = True
             transaction.status = "success"
+            transaction.fee_balance = student.balance
             transaction.save()
 
             if transaction.student == user:
-                message = f"You have successfully paid {transaction.transaction_amount} to {transaction.student.course.faculty.school.name} as school fees."
+                message = f"You have successfully paid {transaction.transaction_amount} to {student.course.faculty.school.name} as school fees."
             else:
-                message = f"You have successfully paid {transaction.transaction_amount} to {transaction.student.course.faculty.school.name} for {transaction.student.user.get_full_name().title()}'s account."
+                message = f"You have successfully paid {transaction.transaction_amount} to {student.course.faculty.school.name} for {student.user.get_full_name().title()}'s account."
             messages.success(request,message)
             return render(request, "index.html", {"current_date": default_now()})
 
@@ -754,7 +758,7 @@ def my_transactions(request):
                 redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
                 return redirect(redirect_url)
         _my_transactions = Transaction.objects.filter(student=student).order_by("-time_stamp")
-        return render(request, "my pays.html", {"my_transactions": _my_transactions, "account": student.course.faculty.school.name})
+        return render(request, "my pays.html", {"my_transactions": _my_transactions})
     messages.error(request, "Access reserved to authenticated users!")
     return redirect("pay_fees:login")
 

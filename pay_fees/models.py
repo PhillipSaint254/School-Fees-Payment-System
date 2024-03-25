@@ -194,6 +194,7 @@ class Transaction(models.Model):
     time_stamp = models.DateTimeField(default=default_now, null=True)
     payment_method = models.CharField(max_length=20, default="m-pesa")
     status = models.CharField(max_length=10, default="incomplete")
+    fee_balance = models.IntegerField(default=45670)
     # Preprocessing data
     merchant_request_id = models.CharField(max_length=100, null=True)
     checkout_request_id = models.CharField(max_length=100, null=True)
