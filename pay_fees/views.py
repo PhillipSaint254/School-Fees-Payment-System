@@ -201,11 +201,11 @@ def user_registration(request):
                 if user is not None:
                     login(request, user)
 
-                if "register-parent" in request.POST:
+                if request.POST.get("register-parent"):
                     """Parent registration"""
                     return render(request, "select student.html")
 
-                elif "register-student" in request.POST:
+                elif request.POST.get("register-student"):
                     """Student registration"""
                     check_reg()
                     course = check_student_details()
@@ -234,7 +234,6 @@ def user_registration(request):
                     messages.success(request, "Registration successful.")
 
                     return render(request, "index.html", {"current_time": default_now()})
-
                 messages.error(request, "Course selection error.")
                 return redirect("pay_fees:register")
 
