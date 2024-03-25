@@ -76,7 +76,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     middle_name = models.CharField(max_length=25, null=True, blank=True)
     last_name = models.CharField(max_length=25)
     id_number = models.IntegerField(null=True)
-    registration_number = models.CharField(max_length=15, unique=True)
+    registration_number = models.CharField(max_length=15, null=True, blank=True)
     email = models.EmailField(blank=True, unique=True, default='')
 
     bio = models.TextField(max_length=500, blank=True, null=True)

@@ -114,13 +114,13 @@ def user_registration(request):
         email = request.POST["email"].strip().lower()
         password1 = request.POST["password1"]
         password2 = request.POST["password2"]
-        reg_number = request.POST["registration-number"].upper().strip()
+        reg_number = request.POST["registration-number"].upper().strip() if request.POST["registration-number"] else ""
         phone = request.POST["phone-number"].strip()
         id_number = request.POST["id-number"].strip()
 
-        faculty_input = request.POST["faculty-input"]
-        school_input = request.POST["school-input"]
-        course_input = request.POST["course-input"]
+        faculty_input = request.POST.get("faculty-input", None)
+        school_input = request.POST.get("school-input", None)
+        course_input = request.POST.get("course-input", None)
 
         print(f"{email} {password1} {password2} {reg_number} {phone} {course_input}")
 
@@ -202,6 +202,9 @@ def user_registration(request):
 
                 if "register-parent" in request.POST:
                     """Parent registration"""
+                    if user is not None:
+                        login(request, user)
+
                     return render(request, "select student.html")
 
                 elif "register-student" in request.POST:
@@ -779,13 +782,14 @@ def my_student(request):
             _user = User.objects.get(get_full_name=student_name)
 
             if _user.registration_number == student_reg:
-                Parent.objects.create(
-                    user=user,
-                    student=_user.student,
-                    parent_name=user.get_full_name()
-                ).save()
-                messages.success(request, f"You have registered as {_user.get_full_name()}'s parent.")
-                return render(request, "index.html", {"current_date": default_now()})
+                return JsonResponse({"success": "successful"})
+                # Parent.objects.create(
+                #     user=user,
+                #     student=_user.student,
+                #     parent_name=user.get_full_name()
+                # ).save()
+                # messages.success(request, f"You have registered as {_user.get_full_name()}'s parent.")
+                # return render(request, "index.html", {"current_date": default_now()})
             messages.success(request,
                              f"The student name you entered does not match the registration number you specified.")
         return render(request, "select student.html")
@@ -1000,3 +1004,7 @@ def initiate_stk_push(request, id):  # Replaces confirm pay
         return redirect(redirect_url)
     messages.error(request, "Access reserved to authenticated users!")
     return redirect("pay_fees:login")
+
+
+def ghost_func(request):
+    return render(request, "select student.html")
