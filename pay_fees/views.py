@@ -479,7 +479,8 @@ def pay_fees(request):
         except Student.DoesNotExist:
 
             try:
-                student = Parent.objects.get(user=user).student.student
+                _user = Parent.objects.get(user=user).student
+                student = Student.objects.get(user=_user)
 
             except Parent.DoesNotExist:
                 messages.error(request, "Please select who you want to pay fees for")
