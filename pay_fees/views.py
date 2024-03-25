@@ -516,25 +516,31 @@ def handle_selected_payment_method(request, id):
     user = request.user
     if user.is_authenticated:
         transaction = Transaction.objects.get(id=id)
-        if transaction.student.user == user:
-            if not transaction.complete:
-                if request.method == "POST":
-                    payment_method = request.POST.get("paymentMethod", "")
-                    transaction.payment_method = payment_method if payment_method else "m-pesa"
-                    transaction.save()
-                    return render(request, "payment details.html", {"transaction": transaction})
-                messages.error(request, "No payment method selected")
+
+        if transaction.student.user != user:
+            try:
+                Parent.objects.get(user=user).student
+            except Parent.DoesNotExist:
+                messages.error(request, "You are not authorized to make this transaction!")
                 schools = School.objects.all()
                 redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
                 return redirect(redirect_url)
-            messages.error(request, "Transaction already effected.")
+
+        if not transaction.complete:
+            if request.method == "POST":
+                payment_method = request.POST.get("paymentMethod", "")
+                transaction.payment_method = payment_method if payment_method else "m-pesa"
+                transaction.save()
+                return render(request, "payment details.html", {"transaction": transaction})
+            messages.error(request, "No payment method selected")
             schools = School.objects.all()
             redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
             return redirect(redirect_url)
-        messages.error(request, "You are not authorized to make this transaction!")
+        messages.error(request, "Transaction already effected.")
         schools = School.objects.all()
         redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
         return redirect(redirect_url)
+
     messages.error(request, "Access reserved to authenticated users!")
     return redirect("pay_fees:login")
 
