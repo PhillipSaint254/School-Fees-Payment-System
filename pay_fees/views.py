@@ -709,6 +709,8 @@ class PayProcessView(CreateAPIView):
             transaction.student.save()
             transaction.complete = True
             transaction.status = "success"
+            transaction.save()
+
             if transaction.student == user:
                 message = f"You have successfully paid {transaction.transaction_amount} to {transaction.student.course.faculty.school.name} as school fees."
             else:
