@@ -114,7 +114,7 @@ def user_registration(request):
         email = request.POST["email"].strip().lower()
         password1 = request.POST["password1"]
         password2 = request.POST["password2"]
-        reg_number = request.POST["registration-number"].upper().strip() if request.POST["registration-number"] else None
+        reg_number = request.POST["registration-number"].upper().strip() if request.POST["registration-number"] else ""
         phone = request.POST["phone-number"].strip()
         id_number = request.POST["id-number"].strip()
 
@@ -129,13 +129,13 @@ def user_registration(request):
                 messages.error(request, "All fields required!")
                 return redirect("pay_fees:register")
 
-        def check_email():
-            try:
-                User.objects.get(email=email)
-                messages.error(request, f"User with the email '{email}' already exists.")
-                return redirect("pay_fees:index")
-            except:
-                pass
+        # def check_email():
+        #     try:
+        #         User.objects.get(email=email)
+        #         messages.error(request, f"User with the email '{email}' already exists.")
+        #         return redirect("pay_fees:index")
+        #     except:
+        #         pass
 
         def check_student_details():
             try:
@@ -201,7 +201,11 @@ def user_registration(request):
                 if user is not None:
                     login(request, user)
 
-                if request.POST.get("register-student") or reg_number:
+                if request.POST.get("register-parent"):
+                    """Parent registration"""
+                    return render(request, "select student.html")
+
+                else:
                     """Student registration"""
                     check_reg()
                     course = check_student_details()
@@ -230,9 +234,8 @@ def user_registration(request):
                     messages.success(request, "Registration successful.")
 
                     return render(request, "index.html", {"current_time": default_now()})
-                else:
-                    """Parent registration"""
-                    return render(request, "select student.html")
+                messages.error(request, "Course selection error.")
+                return redirect("pay_fees:register")
 
             except IntegrityError:
                 messages.error(request, "Email or registration number already registered.")
