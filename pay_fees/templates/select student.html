@@ -114,6 +114,12 @@
             .then(students => {
                 if (studentInput) {
                     studentInput.setAttribute('data-students', JSON.stringify(students));
+                    var studentNameInput = document.getElementById("studentName");
+                    if (studentNameInput) {
+                        studentNameInput.addEventListener('keyup', function() {
+                            filterStudents(this.value);
+                        });
+                    }
                 }
             })
             .catch(error => {
