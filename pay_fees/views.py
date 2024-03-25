@@ -767,20 +767,25 @@ def recover_transaction(request, id):
     user = request.user
     if user.is_authenticated:
         transaction = Transaction.objects.get(id=id)
-        if transaction.student.user == user:
-            if not transaction.payment_method:
-                return render(request, "payment method.html", {"transaction": transaction})
-            if not transaction.transaction_amount or not transaction.msisdn:
-                return render(request, "payment details.html", {"transaction": transaction})
-            if not (transaction.merchant_request_id or transaction.checkout_request_id or
-                    transaction.response_description or transaction.customer_message):
-                return render(request, "confirm pay.html", {"transaction": transaction})
-            if not (transaction.merchant_request_id or transaction.response_description):
-                return render(request, "confirm pay.html", {"transaction": transaction})
-        messages.error(request, "You are not authorized to recover this transaction!")
-        schools = School.objects.all()
-        redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
-        return redirect(redirect_url)
+        if transaction.student.user != user:
+            try:
+                Parent.objects.get(user=user).student
+            except Parent.DoesNotExist:
+                messages.error(request, "Only students and parents are authorised to view transactions.")
+                schools = School.objects.all()
+                redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+                return redirect(redirect_url)
+
+        if not transaction.payment_method:
+            return render(request, "payment method.html", {"transaction": transaction})
+        if not transaction.transaction_amount or not transaction.msisdn:
+            return render(request, "payment details.html", {"transaction": transaction})
+        if not (transaction.merchant_request_id or transaction.checkout_request_id or
+                transaction.response_description or transaction.customer_message):
+            return render(request, "confirm pay.html", {"transaction": transaction})
+        if not (transaction.merchant_request_id or transaction.response_description):
+            return render(request, "confirm pay.html", {"transaction": transaction})
+
     messages.error(request, "Access reserved to authenticated users!")
     return redirect("pay_fees:login")
 
