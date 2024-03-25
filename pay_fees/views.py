@@ -477,10 +477,19 @@ def pay_fees(request):
         try:
             student = Student.objects.get(user=user)
         except Student.DoesNotExist:
-            messages.error(request, "Only students are allowed to make transactions")
-            schools = School.objects.all()
-            redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
-            return redirect(redirect_url)
+
+            try:
+                student = Parent.objects.get(user=user)
+
+            except Parent.DoesNotExist:
+                messages.error(request, "Please select who you want to pay fees for")
+                return redirect("pay_fees:my_student")
+
+            except Exception as e:
+                messages.error(request, f"This error occured: f{str(e)}")
+                schools = School.objects.all()
+                redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
+                return redirect(redirect_url)
 
         payment_options = PaymentMethods.objects.all()
         transaction_id = 1
