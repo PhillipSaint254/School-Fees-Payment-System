@@ -228,9 +228,7 @@ def user_registration(request):
 
             except Exception as error:
                 messages.error(request, error)
-                schools = School.objects.all()
-                redirect_url = reverse('pay_fees:dashboard') + f'?current_time={default_now()}&schools={schools}'
-                return redirect(redirect_url)
+                return redirect("pay_fees:register")
 
         else:
             messages.error(request, "Password mismatch.")
