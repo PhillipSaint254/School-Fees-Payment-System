@@ -908,7 +908,7 @@ def confirm_pay(request, id):
                         response = None
                         response_code = -1
 
-                        for _ in range(5):
+                        for _ in range(20):
                             cl = MpesaClient()
                             phone_number = transaction.msisdn
                             amount = int(transaction.transaction_amount)
