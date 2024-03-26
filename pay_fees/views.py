@@ -116,7 +116,7 @@ def user_registration(request):
         password2 = request.POST["password2"]
         reg_number = request.POST["registration-number"].upper().strip() if request.POST["registration-number"] else ""
         phone = request.POST["phone-number"].strip()
-        id_number = request.POST["id-number"].strip()
+        id_number = request.POST["id-number"].strip() if request.POST["id-number"] else -1
 
         faculty_input = request.POST.get("faculty-input", None)
         school_input = request.POST.get("school-input", None)
