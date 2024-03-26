@@ -10,4 +10,4 @@ def count_characters(value):
 
 @register.simple_tag
 def progress_bar(balance, full):
-    return round((balance/full) * 100, 2)
+    return round((balance - full/full) * 100, 2)
